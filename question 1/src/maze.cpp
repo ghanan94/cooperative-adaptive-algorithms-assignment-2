@@ -8,6 +8,7 @@
 #include <string> // std::string
 #include <sstream> // std::stringstream
 #include <queue> // std::queue
+#include <deque> // std::deque
 
 Maze::Maze(const std::string file_name):
 maze(0),
@@ -74,9 +75,105 @@ void Maze::run_bfs()
  */
 void Maze::run_dfs()
 {
-  for (int x = 0; x < SQUARE_DIMENSION; ++x) {
-    for (int y = 0; y < SQUARE_DIMENSION; ++y) {
+  std::deque<Point *> dfs_fringe;
+
+  // Reset all points
+  for (int x = 0; x < SQUARE_DIMENSION; ++x)
+  {
+    for (int y = 0; y < SQUARE_DIMENSION; ++y)
+    {
       (*maze)[x][y]->reset();
+    }
+  }
+
+  start->set_cost(0);
+  dfs_fringe.push_front(start);
+
+  while (dfs_fringe.size())
+  {
+    Point *p = dfs_fringe.front();
+    dfs_fringe.pop_front();
+
+    if (p->get_is_visited()) {
+      printf("Visting node already visited\n");
+      continue;
+    }
+
+    p->set_visited();
+
+    if (p == end) {
+      // got solution
+      break;
+    }
+
+    Point *u_p = get_up_point(p);
+    Point *r_p = get_right_point(p);
+    Point *d_p = get_down_point(p);
+    Point *l_p = get_left_point(p);
+    int new_cost = p->get_cost() + 1;
+
+    if (l_p)
+    {
+      if(l_p->get_is_visited())
+      {
+        if (l_p->get_cost() > new_cost) {
+          l_p->set_cost(new_cost);
+          l_p->set_parent(p);
+        }
+      } else
+      {
+        l_p->set_cost(new_cost);
+        l_p->set_parent(p);
+        dfs_fringe.push_front(l_p);
+      }
+    }
+
+    if (d_p)
+    {
+      if(d_p->get_is_visited())
+      {
+        if (d_p->get_cost() > new_cost) {
+          d_p->set_cost(new_cost);
+          d_p->set_parent(p);
+        }
+      } else
+      {
+        d_p->set_cost(new_cost);
+        d_p->set_parent(p);
+        dfs_fringe.push_front(d_p);
+      }
+    }
+
+    if (r_p)
+    {
+      if(r_p->get_is_visited())
+      {
+        if (r_p->get_cost() > new_cost) {
+          r_p->set_cost(new_cost);
+          r_p->set_parent(p);
+        }
+      } else
+      {
+        r_p->set_cost(new_cost);
+        r_p->set_parent(p);
+        dfs_fringe.push_front(r_p);
+      }
+    }
+
+    if (u_p)
+    {
+      if(u_p->get_is_visited())
+      {
+        if (u_p->get_cost() > new_cost) {
+          u_p->set_cost(new_cost);
+          u_p->set_parent(p);
+        }
+      } else
+      {
+        u_p->set_cost(new_cost);
+        u_p->set_parent(p);
+        dfs_fringe.push_front(u_p);
+      }
     }
   }
 }

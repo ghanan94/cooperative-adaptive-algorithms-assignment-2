@@ -17,6 +17,7 @@ public:
   void        set_visited();
   int         get_cost();
   void        set_cost(int);
+  void        set_parent(Point *);
 
 private:
   const int   x;
