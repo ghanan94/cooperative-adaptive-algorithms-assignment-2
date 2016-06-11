@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string> // std::string
 #include <sstream> // std::stringstream
+#include <queue> // std::queue
 
 Maze::Maze(const std::string file_name):
 maze(0),

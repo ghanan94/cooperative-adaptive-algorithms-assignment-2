@@ -6,7 +6,6 @@
 #define SQUARE_DIMENSION 25
 
 #include <vector>
-#include <queue>
 #include <string>
 
 class Point;
@@ -22,7 +21,7 @@ public:
   void run_dfs();
   void run_astar();
   void print_grid();
-  
+
 private:
   Grid* maze;
   Point* start;
