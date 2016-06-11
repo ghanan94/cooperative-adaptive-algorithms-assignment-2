@@ -25,6 +25,6 @@ private:
 
   bool check_isfree(int x, int y);
   void print_solution(Grid& solution);
-}
+};
 
 #endif // __MAZE_HPP
