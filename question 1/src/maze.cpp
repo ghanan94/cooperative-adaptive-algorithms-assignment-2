@@ -4,13 +4,19 @@
 #include "maze.hpp"
 #include "point.hpp"
 #include <fstream> // std::ifstream, std::getline
-#include <iostream>
+#include <iostream> // printf
 #include <string> // std::string
 #include <sstream> // std::stringstream
 #include <queue> // std::queue
 #include <deque> // std::deque
 #include <unordered_set> // std::unordered_set
-#include <cstdlib>
+#include <algorithm>
+#include <list>
+
+bool maze_astar_function(Point* p1, Point* p2)
+{
+  return (p1->get_cost() + p1->get_est_cost() < p2->get_cost() + p2->get_est_cost());
+}
 
 Maze::Maze(const std::string file_name):
 maze(0),
@@ -168,10 +174,7 @@ void Maze::run_bfs()
     }
     cnode->set_visited();
     bfs_fringe.pop();
-    //printf("size of queue %lu\n", bfs_fringe.size());
   }
-  //printf("done bfs\n");
-  return;
 }
 
 
@@ -201,11 +204,6 @@ void Maze::run_dfs()
   {
     Point *p = dfs_fringe.front();
     dfs_fringe.pop_front();
-
-    if (p->get_is_visited()) {
-      printf("Visting node already visited\n");
-      continue;
-    }
 
     p->set_visited();
 
@@ -291,9 +289,108 @@ void Maze::run_dfs()
   }
 }
 
+/*
+ * NAME:          run_dfs
+ *
+ * DESCRIPTION:   Runs an A* search to get from start to end points.
+ *                the appropriate parents will be updated in each point.
+ *
+ * PARAMETERS:
+ *  N/A
+ *
+ * RETURNS:
+ *  N/A
+ */
 void Maze::run_astar()
 {
-  return;
+  //Reset any previous pathfinding operations
+  reset();
+
+  std::list<Point*> astar_fringe;
+  astar_fringe.push_back(start);
+
+  while (!astar_fringe.empty())
+  {
+    astar_fringe.sort(maze_astar_function);
+
+    Point* cnode = astar_fringe.front();
+    if (cnode == end)
+    {
+      return;
+    }
+
+    Point* up_pt = get_up_point(cnode);
+    Point* right_pt = get_right_point(cnode);
+    Point* down_pt = get_down_point(cnode);
+    Point* left_pt = get_left_point(cnode);
+
+    if (up_pt)
+    {
+      if ((up_pt->get_is_visited() || up_pt->get_visiting()) &&
+        (cnode->get_cost() + 1) < up_pt->get_cost())
+      {
+        up_pt->set_parent(cnode);
+        up_pt->set_cost(cnode->get_cost() + 1);
+      } else if (!up_pt->get_is_visited() && !up_pt->get_visiting())
+      {
+        astar_fringe.push_back(up_pt);
+        up_pt->set_cost(cnode->get_cost() + 1);
+        up_pt->set_parent(cnode);
+        up_pt->set_visiting();
+      }
+    }
+
+    if (right_pt)
+    {
+      if ((right_pt->get_is_visited() || right_pt->get_visiting()) &&
+        (cnode->get_cost() + 1) < right_pt->get_cost())
+      {
+        right_pt->set_parent(cnode);
+        right_pt->set_cost(cnode->get_cost() + 1);
+      } else if (!right_pt->get_is_visited() && !right_pt->get_visiting())
+      {
+        astar_fringe.push_back(right_pt);
+        right_pt->set_cost(cnode->get_cost() + 1);
+        right_pt->set_parent(cnode);
+        right_pt->set_visiting();
+      }
+    }
+
+    if (down_pt)
+    {
+      if ((down_pt->get_is_visited() || down_pt->get_visiting()) &&
+        (cnode->get_cost() + 1) < down_pt->get_cost())
+      {
+        down_pt->set_parent(cnode);
+        down_pt->set_cost(cnode->get_cost() + 1);
+      } else if (!down_pt->get_is_visited() && !down_pt->get_visiting())
+      {
+        astar_fringe.push_back(down_pt);
+        down_pt->set_cost(cnode->get_cost() + 1);
+        down_pt->set_parent(cnode);
+        down_pt->set_visiting();
+      }
+    }
+
+    if (left_pt)
+    {
+      if ((left_pt->get_is_visited() || left_pt->get_visiting()) &&
+        (cnode->get_cost() + 1) < left_pt->get_cost())
+      {
+        left_pt->set_parent(cnode);
+        left_pt->set_cost(cnode->get_cost() + 1);
+      } else if (!left_pt->get_is_visited() && !left_pt->get_visiting())
+      {
+        astar_fringe.push_back(left_pt);
+        left_pt->set_cost(cnode->get_cost() + 1);
+        left_pt->set_parent(cnode);
+        left_pt->set_visiting();
+      }
+    }
+
+    cnode->set_visited();
+    astar_fringe.pop_front();
+  }
 }
 
 Point* Maze::get_up_point(Point* old_point)

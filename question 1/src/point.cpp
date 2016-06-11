@@ -79,7 +79,7 @@ void Point::set_visiting()
   visiting = true;
 }
 
-const int Point::get_est_cost()
+int Point::get_est_cost()
 {
   return est_cost;
 }
