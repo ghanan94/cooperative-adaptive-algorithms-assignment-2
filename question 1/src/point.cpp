@@ -42,6 +42,7 @@ void Point::reset()
 {
   is_visited = false;
   parent = 0;
+  cost = -1;
 }
 
 void Point::set_visited()
@@ -57,4 +58,9 @@ int Point::get_cost()
 void Point::set_cost(int new_cost)
 {
   cost = new_cost;
+}
+
+void Point::set_parent(Point *new_parent)
+{
+  parent = new_parent;
 }

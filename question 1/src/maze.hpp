@@ -21,6 +21,7 @@ public:
   void run_dfs();
   void run_astar();
   void print_grid();
+  void print_solution();
 
 private:
   Grid* maze;
@@ -28,7 +29,6 @@ private:
   Point* end;
 
   bool check_isfree(int, int);
-  void print_solution(Grid&);
   void parse_maze_file(const std::string);
 
   Point* get_up_point(Point*);

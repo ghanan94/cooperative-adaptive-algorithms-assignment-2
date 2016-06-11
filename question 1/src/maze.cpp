@@ -8,6 +8,8 @@
 #include <string> // std::string
 #include <sstream> // std::stringstream
 #include <queue> // std::queue
+#include <deque> // std::deque
+#include <unordered_set> // std::unordered_set
 
 Maze::Maze(const std::string file_name):
 maze(0),
@@ -31,17 +33,69 @@ bool Maze::check_isfree(int x, int y)
 {
   if (x >= 0 && x < SQUARE_DIMENSION && y >= 0 && y < SQUARE_DIMENSION)
   {
-    return !(*maze)[x][y]->get_is_blocked();
+    return !(*maze)[y][x]->get_is_blocked();
   } else
   {
     return false;
   }
-
 }
 
-void Maze::print_solution(Grid& solution)
+void Maze::print_solution()
 {
-  return;
+  std::unordered_set<Point *> solution_path;
+  Point *temp = end->get_parent();
+
+  while (temp) {
+    solution_path.insert(temp);
+    temp = temp->get_parent();
+  }
+
+  const char* hyphens = std::string(SQUARE_DIMENSION * 2 + 1, '-').c_str();
+  printf(" %s\n", hyphens);
+
+  for (int y = SQUARE_DIMENSION - 1; y >= 0; --y)
+  {
+    printf("| ");
+
+    for (int x = 0; x < SQUARE_DIMENSION; ++x)
+    {
+      Point* point = (*maze)[y][x];
+
+      if (start == point)
+      {
+        printf("S ");
+      } else if (end == point)
+      {
+        printf("E ");
+      } else if (solution_path.end() != solution_path.find(point))
+      {
+        if (point == get_up_point(point->get_parent()))
+        {
+          printf("^ ");
+        } else if (point == get_down_point(point->get_parent()))
+        {
+          printf("v ");
+        } else if (point == get_right_point(point->get_parent()))
+        {
+          printf("> ");
+        } else if (point == get_left_point(point->get_parent()))
+        {
+          printf("< ");
+        } else
+        {
+          printf("* ");
+        }
+      } else
+      {
+        printf("%c ", point->get_is_blocked() ? '#' : ' ');
+      }
+    }
+
+    printf("| \n");
+  }
+
+  printf(" %s\n", hyphens);
+
 }
 
 //Priority is broken in the following order:
@@ -59,9 +113,123 @@ void Maze::run_bfs()
   return;
 }
 
+
+/*
+ * NAME:          run_dfs
+ *
+ * DESCRIPTION:   Runs a depth-first search to get from start to end points.
+ *                the appropriate parents will be updated in each point.
+ *
+ * PARAMETERS:
+ *  N/A
+ *
+ * RETURNS:
+ *  N/A
+ */
 void Maze::run_dfs()
 {
-  return;
+  std::deque<Point *> dfs_fringe;
+
+  // Reset all points
+  for (int y = 0; y < SQUARE_DIMENSION; ++y)
+  {
+    for (int x = 0; x < SQUARE_DIMENSION; ++x)
+    {
+      (*maze)[y][x]->reset();
+    }
+  }
+
+  start->set_cost(0);
+  dfs_fringe.push_front(start);
+
+  while (dfs_fringe.size())
+  {
+    Point *p = dfs_fringe.front();
+    dfs_fringe.pop_front();
+
+    if (p->get_is_visited()) {
+      printf("Visting node already visited\n");
+      continue;
+    }
+
+    p->set_visited();
+
+    printf("Visiting (%d, %d)\n", p->get_x(), p->get_y());
+    if (p == end) {
+      // got solution
+      break;
+    }
+
+    Point *u_p = get_up_point(p);
+    Point *r_p = get_right_point(p);
+    Point *d_p = get_down_point(p);
+    Point *l_p = get_left_point(p);
+    int new_cost = p->get_cost() + 1;
+
+    if (l_p)
+    {
+      if(l_p->get_is_visited())
+      {
+        if (l_p->get_cost() > new_cost) {
+          l_p->set_cost(new_cost);
+          l_p->set_parent(p);
+        }
+      } else
+      {
+        l_p->set_cost(new_cost);
+        l_p->set_parent(p);
+        dfs_fringe.push_front(l_p);
+      }
+    }
+
+    if (d_p)
+    {
+      if(d_p->get_is_visited())
+      {
+        if (d_p->get_cost() > new_cost) {
+          d_p->set_cost(new_cost);
+          d_p->set_parent(p);
+        }
+      } else
+      {
+        d_p->set_cost(new_cost);
+        d_p->set_parent(p);
+        dfs_fringe.push_front(d_p);
+      }
+    }
+
+    if (r_p)
+    {
+      if(r_p->get_is_visited())
+      {
+        if (r_p->get_cost() > new_cost) {
+          r_p->set_cost(new_cost);
+          r_p->set_parent(p);
+        }
+      } else
+      {
+        r_p->set_cost(new_cost);
+        r_p->set_parent(p);
+        dfs_fringe.push_front(r_p);
+      }
+    }
+
+    if (u_p)
+    {
+      if(u_p->get_is_visited())
+      {
+        if (u_p->get_cost() > new_cost) {
+          u_p->set_cost(new_cost);
+          u_p->set_parent(p);
+        }
+      } else
+      {
+        u_p->set_cost(new_cost);
+        u_p->set_parent(p);
+        dfs_fringe.push_front(u_p);
+      }
+    }
+  }
 }
 
 void Maze::run_astar()
@@ -73,7 +241,7 @@ Point* Maze::get_up_point(Point* old_point)
 {
   if (check_isfree(old_point->get_x(), old_point->get_y() + 1))
   {
-    return (*maze)[old_point->get_x()][old_point->get_y() + 1];
+    return (*maze)[old_point->get_y() + 1][old_point->get_x()];
   } else
   {
     return 0;
@@ -84,7 +252,7 @@ Point* Maze::get_down_point(Point* old_point)
 {
   if (check_isfree(old_point->get_x(), old_point->get_y() - 1))
   {
-    return (*maze)[old_point->get_x()][old_point->get_y() - 1];
+    return (*maze)[old_point->get_y() - 1][old_point->get_x()];
   } else
   {
     return 0;
@@ -95,7 +263,7 @@ Point* Maze::get_left_point(Point* old_point)
 {
   if (check_isfree(old_point->get_x() - 1, old_point->get_y()))
   {
-    return (*maze)[old_point->get_x() - 1][old_point->get_y()];
+    return (*maze)[old_point->get_y()][old_point->get_x() - 1];
   } else
   {
     return 0;
@@ -106,7 +274,7 @@ Point* Maze::get_right_point(Point* old_point)
 {
   if (check_isfree(old_point->get_x() + 1,old_point->get_y()))
   {
-    return (*maze)[old_point->get_x() + 1][old_point->get_y()];
+    return (*maze)[old_point->get_y()][old_point->get_x() + 1];
   } else
   {
     return 0;
@@ -117,13 +285,13 @@ void Maze::print_grid() {
   const char* hyphens = std::string(SQUARE_DIMENSION * 2 + 1, '-').c_str();
   printf(" %s\n", hyphens);
 
-  for (int x = SQUARE_DIMENSION - 1; x >= 0; --x)
+  for (int y = SQUARE_DIMENSION - 1; y >= 0; --y)
   {
     printf("| ");
 
-    for (int y = 0; y < SQUARE_DIMENSION; ++y)
+    for (int x = 0; x < SQUARE_DIMENSION; ++x)
     {
-      Point* point = (*maze)[x][y];
+      Point* point = (*maze)[y][x];
 
       if (start == point)
       {
@@ -162,7 +330,7 @@ void Maze::parse_maze_file(const std::string file_name)
 
   maze = new Grid();
 
-  for (int x = 0; x < SQUARE_DIMENSION; ++x)
+  for (int y = 0; y < SQUARE_DIMENSION; ++y)
   {
     std::vector<Point *> row;
     maze->push_back(row);
@@ -185,19 +353,19 @@ void Maze::parse_maze_file(const std::string file_name)
     linestream_end >> e_y;
 
     // Parse maze; 0 = not blocked; 1 = blocked
-    for (int x = SQUARE_DIMENSION - 1; x >= 0; --x)
+    for (int y = SQUARE_DIMENSION - 1; y >= 0; --y)
     {
       std::getline(maze_file, line);
       std::stringstream linestream(line);
       std::getline(linestream, data, ' ');
 
-      for (int y = 0; y < SQUARE_DIMENSION; ++y)
+      for (int x = 0; x < SQUARE_DIMENSION; ++x)
       {
         bool is_blocked;
         linestream >> is_blocked;
 
         Point* new_point = new Point(x, y, is_blocked);
-        (*maze)[x].push_back(new_point);
+        (*maze)[y].push_back(new_point);
 
         if (x == s_x && y == s_y)
         {
