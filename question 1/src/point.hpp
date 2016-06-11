@@ -10,12 +10,16 @@ public:
 
   const int   get_x();
   const int   get_y();
+  bool        get_is_blocked();
+  bool        get_is_visited();
   Point*      get_parent();
+  void        reset();
+  void        set_visited();
 
 private:
   const int   x;
   const int   y;
-  bool        is_empty;
+  bool        is_blocked;
   bool        is_visited;
   Point*      parent;
 };

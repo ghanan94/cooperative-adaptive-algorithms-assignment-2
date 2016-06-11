@@ -28,5 +28,11 @@
 *.out
 *.app
 
+# Ignore compiled binaries
+question\ 1/maze
+
+# Ignore DS_Store files
 .DS_Store
+
+# Always keep .keep files
 !.keep
