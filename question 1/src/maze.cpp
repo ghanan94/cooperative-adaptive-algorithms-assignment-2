@@ -19,6 +19,7 @@ end(0)
 {
   parse_maze_file(file_name);
   start->set_cost(0);
+  find_manchester_cost();
 }
 
 Maze::~Maze()
