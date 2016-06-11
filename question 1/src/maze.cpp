@@ -17,6 +17,7 @@ start(0),
 end(0)
 {
   parse_maze_file(file_name);
+  start->set_cost(0);
 }
 
 Maze::~Maze()
@@ -49,6 +50,7 @@ void Maze::reset()
       (*maze)[y][x]->reset();
     }
   }
+  start->set_cost(0);
 }
 /*
  * NAME:          run_bfs
@@ -85,69 +87,78 @@ void Maze::run_bfs()
     Point* down_pt = get_down_point(cnode);
     Point* left_pt = get_left_point(cnode);
 
-
     if (up_pt)
     {
-      if (up_pt->get_is_visited() &&
+      if ((up_pt->get_is_visited() || up_pt->get_visiting()) &&
         (cnode->get_cost() + 1) < up_pt->get_cost())
       {
         up_pt->set_parent(cnode);
         up_pt->set_cost(cnode->get_cost() + 1);
-      } else if (!up_pt->get_is_visited())
+      } else if (!up_pt->get_is_visited() && !up_pt->get_visiting())
       {
+        printf("a");
         bfs_fringe.push(up_pt);
         up_pt->set_cost(cnode->get_cost() + 1);
         up_pt->set_parent(cnode);
+        up_pt->set_visiting();
       }
     }
 
     if (right_pt)
     {
-      if (right_pt->get_is_visited() &&
+      if ((right_pt->get_is_visited() || right_pt->get_visiting()) &&
         (cnode->get_cost() + 1) < right_pt->get_cost())
       {
         right_pt->set_parent(cnode);
         right_pt->set_cost(cnode->get_cost() + 1);
-      } else if (!right_pt->get_is_visited())
+      } else if (!right_pt->get_is_visited() && !right_pt->get_visiting())
       {
+        printf("b");
         bfs_fringe.push(right_pt);
         right_pt->set_cost(cnode->get_cost() + 1);
         right_pt->set_parent(cnode);
+        right_pt->set_visiting();
       }
     }
 
     if (down_pt)
     {
-      if (down_pt->get_is_visited() &&
+      if ((down_pt->get_is_visited() || down_pt->get_visiting()) &&
         (cnode->get_cost() + 1) < down_pt->get_cost())
       {
         down_pt->set_parent(cnode);
         down_pt->set_cost(cnode->get_cost() + 1);
-      } else if (!down_pt->get_is_visited())
+      } else if (!down_pt->get_is_visited() && !down_pt->get_visiting())
       {
+        printf("c");
         bfs_fringe.push(down_pt);
         down_pt->set_cost(cnode->get_cost() + 1);
         down_pt->set_parent(cnode);
+        down_pt->set_visiting();
       }
     }
 
     if (left_pt)
     {
-      if (left_pt->get_is_visited() &&
+      if ((left_pt->get_is_visited() || left_pt->get_visiting()) &&
         (cnode->get_cost() + 1) < left_pt->get_cost())
       {
         left_pt->set_parent(cnode);
         left_pt->set_cost(cnode->get_cost() + 1);
-      } else if (!left_pt->get_is_visited())
+      } else if (!left_pt->get_is_visited() && !left_pt->get_visiting())
       {
+        printf("d");
         bfs_fringe.push(left_pt);
         left_pt->set_cost(cnode->get_cost() + 1);
         left_pt->set_parent(cnode);
+        left_pt->set_visiting();
       }
     }
     cnode->set_visited();
     bfs_fringe.pop();
+    printf("size of queue %lu\n", bfs_fringe.size());
   }
+  //printf("done bfs\n");
   return;
 }
 
@@ -170,6 +181,8 @@ void Maze::run_dfs()
   std::deque<Point *> dfs_fringe;
 
   start->set_cost(0);
+  start->set_visiting();
+
   dfs_fringe.push_front(start);
 
   while (dfs_fringe.size())
@@ -198,7 +211,7 @@ void Maze::run_dfs()
 
     if (l_p)
     {
-      if(l_p->get_is_visited())
+      if(l_p->get_is_visited() || l_p->get_visiting())
       {
         if (l_p->get_cost() > new_cost) {
           l_p->set_cost(new_cost);
@@ -208,13 +221,14 @@ void Maze::run_dfs()
       {
         l_p->set_cost(new_cost);
         l_p->set_parent(p);
+        l_p->set_visiting();
         dfs_fringe.push_front(l_p);
       }
     }
 
     if (d_p)
     {
-      if(d_p->get_is_visited())
+      if(d_p->get_is_visited() || d_p->get_visiting())
       {
         if (d_p->get_cost() > new_cost) {
           d_p->set_cost(new_cost);
@@ -224,13 +238,14 @@ void Maze::run_dfs()
       {
         d_p->set_cost(new_cost);
         d_p->set_parent(p);
+        d_p->set_visiting();
         dfs_fringe.push_front(d_p);
       }
     }
 
     if (r_p)
     {
-      if(r_p->get_is_visited())
+      if(r_p->get_is_visited() || r_p->get_visiting())
       {
         if (r_p->get_cost() > new_cost) {
           r_p->set_cost(new_cost);
@@ -240,13 +255,14 @@ void Maze::run_dfs()
       {
         r_p->set_cost(new_cost);
         r_p->set_parent(p);
+        r_p->set_visiting();
         dfs_fringe.push_front(r_p);
       }
     }
 
     if (u_p)
     {
-      if(u_p->get_is_visited())
+      if(u_p->get_is_visited() || u_p->get_visiting())
       {
         if (u_p->get_cost() > new_cost) {
           u_p->set_cost(new_cost);
@@ -256,6 +272,7 @@ void Maze::run_dfs()
       {
         u_p->set_cost(new_cost);
         u_p->set_parent(p);
+        u_p->set_visiting();
         dfs_fringe.push_front(u_p);
       }
     }
@@ -302,7 +319,7 @@ Point* Maze::get_left_point(Point* old_point)
 
 Point* Maze::get_right_point(Point* old_point)
 {
-  if (check_isfree(old_point->get_x() + 1,old_point->get_y()))
+  if (check_isfree(old_point->get_x() + 1, old_point->get_y()))
   {
     return (*maze)[old_point->get_y()][old_point->get_x() + 1];
   } else
