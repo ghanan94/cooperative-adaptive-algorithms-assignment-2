@@ -4,9 +4,15 @@
 #include "maze.hpp"
 #include <string>
 
-int main()
+int main(int argc, char *argv[])
 {
-  Maze m("mazes/maze1.txt");
+  if (argc < 2) {
+    printf("Usage:\n");
+    printf("\t%s <maze_file_path>\n", argv[0]);
+    return 1;
+  }
+
+  Maze m(argv[1]);
   m.print_grid();
   m.run_dfs();
   m.print_solution();
