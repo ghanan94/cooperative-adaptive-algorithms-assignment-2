@@ -9,10 +9,10 @@ public:
 
   const int   get_x();
   const int   get_y();
-  Point*      get_parent();
+  Point&      get_parent();
 
 private:
   const int x;
   const int y;
-  Point* const parent;
+  Point& parent;
 };
