@@ -14,7 +14,10 @@ int main(int argc, char *argv[])
 
   Maze m(argv[1]);
   m.print_grid();
-  m.run_dfs();
+  //m.run_dfs();
+  //m.print_solution();
+  //m.print_grid();
+  m.run_bfs();
   m.print_solution();
   return 0;
 }

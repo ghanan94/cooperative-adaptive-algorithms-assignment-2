@@ -40,76 +40,114 @@ bool Maze::check_isfree(int x, int y)
   }
 }
 
-void Maze::print_solution()
+void Maze::reset()
 {
-  std::unordered_set<Point *> solution_path;
-  Point *temp = end->get_parent();
-
-  while (temp) {
-    solution_path.insert(temp);
-    temp = temp->get_parent();
-  }
-
-  const char* hyphens = std::string(SQUARE_DIMENSION * 2 + 1, '-').c_str();
-  printf(" %s\n", hyphens);
-
-  for (int y = SQUARE_DIMENSION - 1; y >= 0; --y)
+  for (int y = 0; y < SQUARE_DIMENSION; ++y)
   {
-    printf("| ");
-
     for (int x = 0; x < SQUARE_DIMENSION; ++x)
     {
-      Point* point = (*maze)[y][x];
-
-      if (start == point)
-      {
-        printf("S ");
-      } else if (end == point)
-      {
-        printf("E ");
-      } else if (solution_path.end() != solution_path.find(point))
-      {
-        if (point == get_up_point(point->get_parent()))
-        {
-          printf("^ ");
-        } else if (point == get_down_point(point->get_parent()))
-        {
-          printf("v ");
-        } else if (point == get_right_point(point->get_parent()))
-        {
-          printf("> ");
-        } else if (point == get_left_point(point->get_parent()))
-        {
-          printf("< ");
-        } else
-        {
-          printf("* ");
-        }
-      } else
-      {
-        printf("%c ", point->get_is_blocked() ? '#' : ' ');
-      }
+      (*maze)[y][x]->reset();
     }
-
-    printf("| \n");
   }
-
-  printf(" %s\n", hyphens);
-
 }
-
-//Priority is broken in the following order:
-//1. North 2. East 3. South 4. West
+/*
+ * NAME:          run_bfs
+ *
+ * DESCRIPTION:   Runs a breadth-first search to get from start to end points.
+ *                the appropriate parents will be updated in each point.
+ *
+ * PARAMETERS:
+ *  N/A
+ *
+ * RETURNS:
+ *  N/A
+ *
+ * NOTES:         Priority is in the following order: Up->Right->Down->Left
+ */
 void Maze::run_bfs()
 {
+  //Reset any previous pathfinding operations
+  reset();
+
   std::queue<Point*> bfs_fringe;
   bfs_fringe.push(start);
 
-  /*while (!bfs_fringe.empty())
+  while (!bfs_fringe.empty())
   {
     Point* cnode = bfs_fringe.front();
-  }*/
+    if (cnode == end)
+    {
+      return;
+    }
 
+    Point* up_pt = get_up_point(cnode);
+    Point* right_pt = get_right_point(cnode);
+    Point* down_pt = get_down_point(cnode);
+    Point* left_pt = get_left_point(cnode);
+
+
+    if (up_pt)
+    {
+      if (up_pt->get_is_visited() &&
+        (cnode->get_cost() + 1) < up_pt->get_cost())
+      {
+        up_pt->set_parent(cnode);
+        up_pt->set_cost(cnode->get_cost() + 1);
+      } else if (!up_pt->get_is_visited())
+      {
+        bfs_fringe.push(up_pt);
+        up_pt->set_cost(cnode->get_cost() + 1);
+        up_pt->set_parent(cnode);
+      }
+    }
+
+    if (right_pt)
+    {
+      if (right_pt->get_is_visited() &&
+        (cnode->get_cost() + 1) < right_pt->get_cost())
+      {
+        right_pt->set_parent(cnode);
+        right_pt->set_cost(cnode->get_cost() + 1);
+      } else if (!right_pt->get_is_visited())
+      {
+        bfs_fringe.push(right_pt);
+        right_pt->set_cost(cnode->get_cost() + 1);
+        right_pt->set_parent(cnode);
+      }
+    }
+
+    if (down_pt)
+    {
+      if (down_pt->get_is_visited() &&
+        (cnode->get_cost() + 1) < down_pt->get_cost())
+      {
+        down_pt->set_parent(cnode);
+        down_pt->set_cost(cnode->get_cost() + 1);
+      } else if (!down_pt->get_is_visited())
+      {
+        bfs_fringe.push(down_pt);
+        down_pt->set_cost(cnode->get_cost() + 1);
+        down_pt->set_parent(cnode);
+      }
+    }
+
+    if (left_pt)
+    {
+      if (left_pt->get_is_visited() &&
+        (cnode->get_cost() + 1) < left_pt->get_cost())
+      {
+        left_pt->set_parent(cnode);
+        left_pt->set_cost(cnode->get_cost() + 1);
+      } else if (!left_pt->get_is_visited())
+      {
+        bfs_fringe.push(left_pt);
+        left_pt->set_cost(cnode->get_cost() + 1);
+        left_pt->set_parent(cnode);
+      }
+    }
+    cnode->set_visited();
+    bfs_fringe.pop();
+  }
   return;
 }
 
@@ -128,16 +166,8 @@ void Maze::run_bfs()
  */
 void Maze::run_dfs()
 {
+  reset();
   std::deque<Point *> dfs_fringe;
-
-  // Reset all points
-  for (int y = 0; y < SQUARE_DIMENSION; ++y)
-  {
-    for (int x = 0; x < SQUARE_DIMENSION; ++x)
-    {
-      (*maze)[y][x]->reset();
-    }
-  }
 
   start->set_cost(0);
   dfs_fringe.push_front(start);
@@ -279,6 +309,67 @@ Point* Maze::get_right_point(Point* old_point)
   {
     return 0;
   }
+}
+/*******************************************************************************
+                          Input/Output Functions
+*******************************************************************************/
+
+void Maze::print_solution()
+{
+  std::unordered_set<Point *> solution_path;
+  Point *temp = end->get_parent();
+
+  while (temp) {
+    solution_path.insert(temp);
+    temp = temp->get_parent();
+  }
+
+  const char* hyphens = std::string(SQUARE_DIMENSION * 2 + 1, '-').c_str();
+  printf(" %s\n", hyphens);
+
+  for (int y = SQUARE_DIMENSION - 1; y >= 0; --y)
+  {
+    printf("| ");
+
+    for (int x = 0; x < SQUARE_DIMENSION; ++x)
+    {
+      Point* point = (*maze)[y][x];
+
+      if (start == point)
+      {
+        printf("S ");
+      } else if (end == point)
+      {
+        printf("E ");
+      } else if (solution_path.end() != solution_path.find(point))
+      {
+        if (point == get_up_point(point->get_parent()))
+        {
+          printf("^ ");
+        } else if (point == get_down_point(point->get_parent()))
+        {
+          printf("v ");
+        } else if (point == get_right_point(point->get_parent()))
+        {
+          printf("> ");
+        } else if (point == get_left_point(point->get_parent()))
+        {
+          printf("< ");
+        } else
+        {
+          printf("* ");
+        }
+      } else
+      {
+        printf("%c ", point->get_is_blocked() ? '#' : ' ');
+      }
+    }
+
+    printf("| \n");
+  }
+
+  printf(" %s\n", hyphens);
+
 }
 
 void Maze::print_grid() {
