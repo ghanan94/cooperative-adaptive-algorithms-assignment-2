@@ -36,6 +36,8 @@ private:
   Point* get_down_point(Point*);
   Point* get_left_point(Point*);
   Point* get_right_point(Point*);
+
+  void   find_manchester_cost();
 };
 
 #endif // __MAZE_HPP__

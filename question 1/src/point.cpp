@@ -10,7 +10,8 @@ is_blocked(is_blocked),
 is_visited(false),
 parent(0),
 cost(INT_MAX),
-visiting(false) {}
+visiting(false),
+est_cost(INT_MAX) {}
 
 Point::~Point()
 {}
@@ -76,4 +77,14 @@ bool Point::get_visiting()
 void Point::set_visiting()
 {
   visiting = true;
+}
+
+int Point::get_est_cost()
+{
+  return est_cost;
+}
+
+void Point::set_est_cost(int new_est_cost)
+{
+  est_cost = new_est_cost;
 }
