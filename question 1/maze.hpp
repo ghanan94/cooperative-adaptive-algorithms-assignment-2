@@ -1,10 +1,11 @@
 // Prototype of Maze
 //@file maze.hpp
-#ifndef __MAZE_HPP
-#define __MAZE_HPP
+#ifndef __MAZE_HPP__
+#define __MAZE_HPP__
 
 #define SQUARE_DIMENSION 25
 #include <vector>
+#include <queue>
 
 class Point;
 class Maze
@@ -23,8 +24,8 @@ private:
   Point& start;
   Point& end;
 
-  bool check_isfree(int x, int y);
-  void print_solution(Grid& solution);
+  bool check_isfree(int, int);
+  void print_solution(Grid&);
 };
 
-#endif // __MAZE_HPP
+#endif // __MAZE_HPP__

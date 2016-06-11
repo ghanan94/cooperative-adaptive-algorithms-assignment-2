@@ -2,11 +2,12 @@
 //@file point.cpp
 #include "point.hpp"
 
-Point::Point(int x, int y, bool is_empty, Point& parent):
+Point::Point(int x, int y, bool is_empty):
 x(x),
 y(y),
 is_empty(is_empty),
-parent(parent) {}
+is_visited(false),
+parent(NULL) {}
 
 Point::~Point()
 {}
