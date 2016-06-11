@@ -8,5 +8,7 @@ int main()
 {
   Maze m("mazes/maze1.txt");
   m.print_grid();
+  m.run_dfs();
+  m.print_grid();
   return 0;
 }

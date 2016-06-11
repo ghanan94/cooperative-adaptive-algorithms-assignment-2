@@ -42,6 +42,7 @@ void Point::reset()
 {
   is_visited = false;
   parent = 0;
+  cost = -1;
 }
 
 void Point::set_visited()

@@ -74,7 +74,11 @@ void Maze::run_bfs()
  */
 void Maze::run_dfs()
 {
-  return;
+  for (int x = 0; x < SQUARE_DIMENSION; ++x) {
+    for (int y = 0; y < SQUARE_DIMENSION; ++y) {
+      (*maze)[x][y]->reset();
+    }
+  }
 }
 
 void Maze::run_astar()
