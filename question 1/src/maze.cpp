@@ -10,6 +10,7 @@
 #include <queue> // std::queue
 #include <deque> // std::deque
 #include <unordered_set> // std::unordered_set
+#include <cstdlib>
 
 Maze::Maze(const std::string file_name):
 maze(0),
@@ -51,6 +52,20 @@ void Maze::reset()
     }
   }
   start->set_cost(0);
+}
+
+void Maze::find_manchester_cost()
+{
+  int x_diff, y_diff;
+  for (int y = 0; y < SQUARE_DIMENSION; ++y)
+  {
+    y_diff = abs(y - end->get_y());
+    for (int x = 0; x < SQUARE_DIMENSION; ++x)
+    {
+      x_diff = abs(x - end->get_x());
+      (*maze)[y][x]->set_est_cost(y_diff + x_diff);
+    }
+  }
 }
 /*
  * NAME:          run_bfs
