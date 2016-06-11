@@ -12,7 +12,8 @@ public:
   Point&      get_parent();
 
 private:
-  const int x;
-  const int y;
-  Point& parent;
+  const int   x;
+  const int   y;
+  bool        is_empty;
+  Point&      parent;
 };

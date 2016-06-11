@@ -2,9 +2,10 @@
 //@file point.cpp
 #include "point.hpp"
 
-Point::Point(int x, int y, Point& parent):
+Point::Point(int x, int y, bool is_empty, Point& parent):
 x(x),
 y(y),
+is_empty(is_empty),
 parent(parent) {}
 
 Point::~Point()
