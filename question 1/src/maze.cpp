@@ -40,71 +40,8 @@ bool Maze::check_isfree(int x, int y)
   }
 }
 
-void Maze::print_solution()
+void Maze::reset()
 {
-  std::unordered_set<Point *> solution_path;
-  Point *temp = end->get_parent();
-
-  while (temp) {
-    solution_path.insert(temp);
-    temp = temp->get_parent();
-  }
-
-  const char* hyphens = std::string(SQUARE_DIMENSION * 2 + 1, '-').c_str();
-  printf(" %s\n", hyphens);
-
-  for (int y = SQUARE_DIMENSION - 1; y >= 0; --y)
-  {
-    printf("| ");
-
-    for (int x = 0; x < SQUARE_DIMENSION; ++x)
-    {
-      Point* point = (*maze)[y][x];
-
-      if (start == point)
-      {
-        printf("S ");
-      } else if (end == point)
-      {
-        printf("E ");
-      } else if (solution_path.end() != solution_path.find(point))
-      {
-        if (point == get_up_point(point->get_parent()))
-        {
-          printf("^ ");
-        } else if (point == get_down_point(point->get_parent()))
-        {
-          printf("v ");
-        } else if (point == get_right_point(point->get_parent()))
-        {
-          printf("> ");
-        } else if (point == get_left_point(point->get_parent()))
-        {
-          printf("< ");
-        } else
-        {
-          printf("* ");
-        }
-      } else
-      {
-        printf("%c ", point->get_is_blocked() ? '#' : ' ');
-      }
-    }
-
-    printf("| \n");
-  }
-
-  printf(" %s\n", hyphens);
-
-}
-
-//Priority is broken in the following order:
-//1. North 2. East 3. South 4. West
-void Maze::run_bfs()
-{
-  std::queue<Point*> bfs_fringe;
-  bfs_fringe.push(start);
-
   for (int y = 0; y < SQUARE_DIMENSION; ++y)
   {
     for (int x = 0; x < SQUARE_DIMENSION; ++x)
@@ -112,6 +49,28 @@ void Maze::run_bfs()
       (*maze)[y][x]->reset();
     }
   }
+}
+/*
+ * NAME:          run_bfs
+ *
+ * DESCRIPTION:   Runs a breadth-first search to get from start to end points.
+ *                the appropriate parents will be updated in each point.
+ *
+ * PARAMETERS:
+ *  N/A
+ *
+ * RETURNS:
+ *  N/A
+ *
+ * NOTES:         Priority is in the following order: Up->Right->Down->Left
+ */
+void Maze::run_bfs()
+{
+  //Reset any previous pathfinding operations
+  reset();
+
+  std::queue<Point*> bfs_fringe;
+  bfs_fringe.push(start);
 
   while (!bfs_fringe.empty())
   {
@@ -207,16 +166,8 @@ void Maze::run_bfs()
  */
 void Maze::run_dfs()
 {
+  reset();
   std::deque<Point *> dfs_fringe;
-
-  // Reset all points
-  for (int y = 0; y < SQUARE_DIMENSION; ++y)
-  {
-    for (int x = 0; x < SQUARE_DIMENSION; ++x)
-    {
-      (*maze)[y][x]->reset();
-    }
-  }
 
   start->set_cost(0);
   dfs_fringe.push_front(start);
@@ -358,6 +309,67 @@ Point* Maze::get_right_point(Point* old_point)
   {
     return 0;
   }
+}
+/*******************************************************************************
+                          Input/Output Functions
+*******************************************************************************/
+
+void Maze::print_solution()
+{
+  std::unordered_set<Point *> solution_path;
+  Point *temp = end->get_parent();
+
+  while (temp) {
+    solution_path.insert(temp);
+    temp = temp->get_parent();
+  }
+
+  const char* hyphens = std::string(SQUARE_DIMENSION * 2 + 1, '-').c_str();
+  printf(" %s\n", hyphens);
+
+  for (int y = SQUARE_DIMENSION - 1; y >= 0; --y)
+  {
+    printf("| ");
+
+    for (int x = 0; x < SQUARE_DIMENSION; ++x)
+    {
+      Point* point = (*maze)[y][x];
+
+      if (start == point)
+      {
+        printf("S ");
+      } else if (end == point)
+      {
+        printf("E ");
+      } else if (solution_path.end() != solution_path.find(point))
+      {
+        if (point == get_up_point(point->get_parent()))
+        {
+          printf("^ ");
+        } else if (point == get_down_point(point->get_parent()))
+        {
+          printf("v ");
+        } else if (point == get_right_point(point->get_parent()))
+        {
+          printf("> ");
+        } else if (point == get_left_point(point->get_parent()))
+        {
+          printf("< ");
+        } else
+        {
+          printf("* ");
+        }
+      } else
+      {
+        printf("%c ", point->get_is_blocked() ? '#' : ' ');
+      }
+    }
+
+    printf("| \n");
+  }
+
+  printf(" %s\n", hyphens);
+
 }
 
 void Maze::print_grid() {

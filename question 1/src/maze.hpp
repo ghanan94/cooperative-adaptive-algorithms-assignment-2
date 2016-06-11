@@ -22,6 +22,7 @@ public:
   void run_astar();
   void print_grid();
   void print_solution();
+  void reset();
 
 private:
   Grid* maze;
