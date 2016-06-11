@@ -96,7 +96,6 @@ void Maze::run_bfs()
         up_pt->set_cost(cnode->get_cost() + 1);
       } else if (!up_pt->get_is_visited() && !up_pt->get_visiting())
       {
-        printf("a");
         bfs_fringe.push(up_pt);
         up_pt->set_cost(cnode->get_cost() + 1);
         up_pt->set_parent(cnode);
@@ -113,7 +112,6 @@ void Maze::run_bfs()
         right_pt->set_cost(cnode->get_cost() + 1);
       } else if (!right_pt->get_is_visited() && !right_pt->get_visiting())
       {
-        printf("b");
         bfs_fringe.push(right_pt);
         right_pt->set_cost(cnode->get_cost() + 1);
         right_pt->set_parent(cnode);
@@ -130,7 +128,6 @@ void Maze::run_bfs()
         down_pt->set_cost(cnode->get_cost() + 1);
       } else if (!down_pt->get_is_visited() && !down_pt->get_visiting())
       {
-        printf("c");
         bfs_fringe.push(down_pt);
         down_pt->set_cost(cnode->get_cost() + 1);
         down_pt->set_parent(cnode);
@@ -147,7 +144,6 @@ void Maze::run_bfs()
         left_pt->set_cost(cnode->get_cost() + 1);
       } else if (!left_pt->get_is_visited() && !left_pt->get_visiting())
       {
-        printf("d");
         bfs_fringe.push(left_pt);
         left_pt->set_cost(cnode->get_cost() + 1);
         left_pt->set_parent(cnode);
@@ -156,7 +152,7 @@ void Maze::run_bfs()
     }
     cnode->set_visited();
     bfs_fringe.pop();
-    printf("size of queue %lu\n", bfs_fringe.size());
+    //printf("size of queue %lu\n", bfs_fringe.size());
   }
   //printf("done bfs\n");
   return;
@@ -197,7 +193,7 @@ void Maze::run_dfs()
 
     p->set_visited();
 
-    printf("Visiting (%d, %d)\n", p->get_x(), p->get_y());
+    //printf("Visiting (%d, %d)\n", p->get_x(), p->get_y());
     if (p == end) {
       // got solution
       break;
