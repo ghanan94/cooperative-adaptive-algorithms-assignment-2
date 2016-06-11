@@ -29,7 +29,14 @@ Maze::~Maze()
 
 bool Maze::check_isfree(int x, int y)
 {
-  return !(*maze)[x][y]->get_is_blocked();
+  if (x >= 0 && x < SQUARE_DIMENSION && y >= 0 && y < SQUARE_DIMENSION)
+  {
+    return !(*maze)[x][y]->get_is_blocked();
+  } else
+  {
+    return false;
+  }
+
 }
 
 void Maze::print_solution(Grid& solution)
@@ -37,8 +44,18 @@ void Maze::print_solution(Grid& solution)
   return;
 }
 
+//Priority is broken in the following order:
+//1. North 2. East 3. South 4. West
 void Maze::run_bfs()
 {
+  std::queue<Point*> bfs_fringe;
+  bfs_fringe.push(start);
+
+  /*while (!bfs_fringe.empty())
+  {
+    Point* cnode = bfs_fringe.front();
+  }*/
+
   return;
 }
 
@@ -52,14 +69,60 @@ void Maze::run_astar()
   return;
 }
 
+Point* Maze::get_up_point(Point* old_point)
+{
+  if (check_isfree(old_point->get_x(), old_point->get_y() + 1))
+  {
+    return (*maze)[old_point->get_x()][old_point->get_y() + 1];
+  } else
+  {
+    return 0;
+  }
+}
+
+Point* Maze::get_down_point(Point* old_point)
+{
+  if (check_isfree(old_point->get_x(), old_point->get_y() - 1))
+  {
+    return (*maze)[old_point->get_x()][old_point->get_y() - 1];
+  } else
+  {
+    return 0;
+  }
+}
+
+Point* Maze::get_left_point(Point* old_point)
+{
+  if (check_isfree(old_point->get_x() - 1, old_point->get_y()))
+  {
+    return (*maze)[old_point->get_x() - 1][old_point->get_y()];
+  } else
+  {
+    return 0;
+  }
+}
+
+Point* Maze::get_right_point(Point* old_point)
+{
+  if (check_isfree(old_point->get_x() + 1,old_point->get_y()))
+  {
+    return (*maze)[old_point->get_x() + 1][old_point->get_y()];
+  } else
+  {
+    return 0;
+  }
+}
+
 void Maze::print_grid() {
   const char* hyphens = std::string(SQUARE_DIMENSION * 2 + 1, '-').c_str();
   printf(" %s\n", hyphens);
 
-  for (int x = SQUARE_DIMENSION - 1; x >= 0; --x) {
+  for (int x = SQUARE_DIMENSION - 1; x >= 0; --x)
+  {
     printf("| ");
 
-    for (int y = 0; y < SQUARE_DIMENSION; ++y) {
+    for (int y = 0; y < SQUARE_DIMENSION; ++y)
+    {
       Point* point = (*maze)[x][y];
 
       if (start == point)
@@ -80,7 +143,8 @@ void Maze::print_grid() {
   printf(" %s\n", hyphens);
 }
 
-void Maze::parse_maze_file(const std::string file_name) {
+void Maze::parse_maze_file(const std::string file_name)
+{
   std::ifstream maze_file;
   std::string line;
   std::string data;
@@ -89,7 +153,8 @@ void Maze::parse_maze_file(const std::string file_name) {
   maze_file.open(file_name);
 
   // If a maze already exists, delete/free it
-  if (maze) {
+  if (maze)
+  {
     delete maze;
     start = 0;
     end = 0;
@@ -97,7 +162,8 @@ void Maze::parse_maze_file(const std::string file_name) {
 
   maze = new Grid();
 
-  for (int x = 0; x < SQUARE_DIMENSION; ++x) {
+  for (int x = 0; x < SQUARE_DIMENSION; ++x)
+  {
     std::vector<Point *> row;
     maze->push_back(row);
   }
@@ -133,9 +199,11 @@ void Maze::parse_maze_file(const std::string file_name) {
         Point* new_point = new Point(x, y, is_blocked);
         (*maze)[x].push_back(new_point);
 
-        if (x == s_x && y == s_y) {
+        if (x == s_x && y == s_y)
+        {
           start = new_point;
-        } else if (x == e_x && y == e_y) {
+        } else if (x == e_x && y == e_y)
+        {
           end = new_point;
         }
       }

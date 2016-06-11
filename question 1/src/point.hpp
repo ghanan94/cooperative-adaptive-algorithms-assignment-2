@@ -15,6 +15,8 @@ public:
   Point*      get_parent();
   void        reset();
   void        set_visited();
+  int         get_cost();
+  void        set_cost(int);
 
 private:
   const int   x;
@@ -22,6 +24,7 @@ private:
   bool        is_blocked;
   bool        is_visited;
   Point*      parent;
+  int         cost;
 };
 
 #endif //__POINT_HPP__

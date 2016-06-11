@@ -30,6 +30,11 @@ private:
   bool check_isfree(int, int);
   void print_solution(Grid&);
   void parse_maze_file(const std::string);
+
+  Point* get_up_point(Point*);
+  Point* get_down_point(Point*);
+  Point* get_left_point(Point*);
+  Point* get_right_point(Point*);
 };
 
 #endif // __MAZE_HPP__

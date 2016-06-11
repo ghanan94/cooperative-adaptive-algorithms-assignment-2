@@ -7,7 +7,8 @@ x(x),
 y(y),
 is_blocked(is_blocked),
 is_visited(false),
-parent(0) {}
+parent(0),
+cost(-1) {}
 
 Point::~Point()
 {}
@@ -46,4 +47,14 @@ void Point::reset()
 void Point::set_visited()
 {
   is_visited = true;
+}
+
+int Point::get_cost()
+{
+  return cost;
+}
+
+void Point::set_cost(int new_cost)
+{
+  cost = new_cost;
 }
