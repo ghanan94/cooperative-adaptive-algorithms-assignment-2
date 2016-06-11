@@ -18,6 +18,8 @@ public:
   int         get_cost();
   void        set_cost(int);
   void        set_parent(Point*);
+  bool        get_visiting();
+  void        set_visiting();
 
 private:
   const int   x;
@@ -26,6 +28,7 @@ private:
   bool        is_visited;
   Point*      parent;
   int         cost;
+  bool        visiting;
 };
 
 #endif //__POINT_HPP__

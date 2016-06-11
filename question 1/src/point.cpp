@@ -1,6 +1,7 @@
 // Implementation file for class Point
 //@file point.cpp
 #include "point.hpp"
+#include <climits>
 
 Point::Point(int x, int y, bool is_blocked):
 x(x),
@@ -8,7 +9,8 @@ y(y),
 is_blocked(is_blocked),
 is_visited(false),
 parent(0),
-cost(-1) {}
+cost(INT_MAX),
+visiting(false) {}
 
 Point::~Point()
 {}
@@ -42,7 +44,8 @@ void Point::reset()
 {
   is_visited = false;
   parent = 0;
-  cost = -1;
+  cost = INT_MAX;
+  visiting = false;
 }
 
 void Point::set_visited()
@@ -63,4 +66,14 @@ void Point::set_cost(int new_cost)
 void Point::set_parent(Point* new_parent)
 {
   parent = new_parent;
+}
+
+bool Point::get_visiting()
+{
+  return visiting;
+}
+
+void Point::set_visiting()
+{
+  visiting = true;
 }
