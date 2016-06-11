@@ -59,6 +59,19 @@ void Maze::run_bfs()
   return;
 }
 
+
+/*
+ * NAME:          run_dfs
+ *
+ * DESCRIPTION:   Runs a depth-first search to get from start to end points.
+ *                the appropriate parents will be updated in each point.
+ *
+ * PARAMETERS:
+ *  N/A
+ *
+ * RETURNS:
+ *  N/A
+ */
 void Maze::run_dfs()
 {
   return;
