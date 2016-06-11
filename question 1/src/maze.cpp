@@ -105,10 +105,73 @@ void Maze::run_bfs()
   std::queue<Point*> bfs_fringe;
   bfs_fringe.push(start);
 
-  /*while (!bfs_fringe.empty())
+  while (!bfs_fringe.empty())
   {
     Point* cnode = bfs_fringe.front();
-  }*/
+    Point* up_pt = get_up_point(cnode);
+    Point* right_pt = get_right_point(cnode);
+    Point* down_pt = get_down_point(cnode);
+    Point* left_pt = get_left_point(cnode);
+
+    if (up_pt)
+    {
+      if (up_pt->get_is_visited() &&
+        (cnode->get_cost() + 1) < up_pt->get_cost())
+      {
+        up_pt->set_parent(cnode);
+        up_pt->set_cost(cnode->get_cost() + 1);
+      } else if (!up_pt->get_is_visited())
+      {
+        bfs_fringe.push(up_pt);
+        up_pt->set_cost(cnode->get_cost() + 1);
+      }
+    }
+
+    if (right_pt)
+    {
+      if (right_pt->get_is_visited() &&
+        (cnode->get_cost() + 1) < right_pt->get_cost())
+      {
+        right_pt->set_parent(cnode);
+        right_pt->set_cost(cnode->get_cost() + 1);
+      } else if (!right_pt->get_is_visited())
+      {
+        bfs_fringe.push(right_pt);
+        right_pt->set_cost(cnode->get_cost() + 1);
+      }
+    }
+
+    if (down_pt)
+    {
+      if (down_pt->get_is_visited() &&
+        (cnode->get_cost() + 1) < down_pt->get_cost())
+      {
+        down_pt->set_parent(cnode);
+        down_pt->set_cost(cnode->get_cost() + 1);
+      } else if (!right_pt->get_is_visited())
+      {
+        bfs_fringe.push(down_pt);
+        down_pt->set_cost(cnode->get_cost() + 1);
+      }
+    }
+
+    if (left_pt)
+    {
+      if (left_pt->get_is_visited() &&
+        (cnode->get_cost() + 1) < left_pt->get_cost())
+      {
+        left_pt->set_parent(cnode);
+        left_pt->set_cost(cnode->get_cost() + 1);
+      } else if (!left_pt->get_is_visited())
+      {
+        bfs_fringe.push(left_pt);
+        left_pt->set_cost(cnode->get_cost() + 1);
+      }
+    }
+
+    cnode->set_visited();
+    bfs_fringe.pop();
+  }
 
   return;
 }

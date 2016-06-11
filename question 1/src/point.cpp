@@ -60,7 +60,7 @@ void Point::set_cost(int new_cost)
   cost = new_cost;
 }
 
-void Point::set_parent(Point *new_parent)
+void Point::set_parent(Point* new_parent)
 {
   parent = new_parent;
 }
