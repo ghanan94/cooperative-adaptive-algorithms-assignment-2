@@ -9,6 +9,7 @@
 #include <sstream> // std::stringstream
 #include <queue> // std::queue
 #include <deque> // std::deque
+#include <unordered_set> // std::unordered_set
 
 Maze::Maze(const std::string file_name):
 maze(0),
@@ -37,12 +38,49 @@ bool Maze::check_isfree(int x, int y)
   {
     return false;
   }
-
 }
 
-void Maze::print_solution(Grid& solution)
+void Maze::print_solution()
 {
-  return;
+  std::unordered_set<Point *> solution_path;
+  Point *temp = end->get_parent();
+
+  while (temp) {
+    solution_path.insert(temp);
+    temp = temp->get_parent();
+  }
+
+  const char* hyphens = std::string(SQUARE_DIMENSION * 2 + 1, '-').c_str();
+  printf(" %s\n", hyphens);
+
+  for (int x = SQUARE_DIMENSION - 1; x >= 0; --x)
+  {
+    printf("| ");
+
+    for (int y = 0; y < SQUARE_DIMENSION; ++y)
+    {
+      Point* point = (*maze)[x][y];
+
+      if (start == point)
+      {
+        printf("S ");
+      } else if (end == point)
+      {
+        printf("E ");
+      } else if (solution_path.end() != solution_path.find(point))
+      {
+        printf("* ");
+      } else
+      {
+        printf("%c ", point->get_is_blocked() ? '#' : ' ');
+      }
+    }
+
+    printf("| \n");
+  }
+
+  printf(" %s\n", hyphens);
+
 }
 
 //Priority is broken in the following order:
