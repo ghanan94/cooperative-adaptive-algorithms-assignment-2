@@ -20,7 +20,7 @@ public:
   void        set_parent(Point*);
   bool        get_visiting();
   void        set_visiting();
-  const int   get_est_cost();
+  int         get_est_cost();
   void        set_est_cost(int);
 
 private:
