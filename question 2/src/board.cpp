@@ -3,6 +3,7 @@
 #include "board.hpp"
 #include <string>
 #include <iostream>
+#include <climits>
 
 Board::Board():
 current_player(Square::BLACK)
@@ -36,6 +37,14 @@ current_player(current_player) {}
 
 Board::~Board()
 {
+  for (int x = 0; x < SQUARE_DIMENSION; ++x)
+  {
+    for (int y = 0; y < SQUARE_DIMENSION; ++y)
+    {
+      delete (*board)[x][y];
+    }
+  }
+
   delete board; //calls delete on all pointers it holds
 }
 
@@ -53,22 +62,22 @@ Board::find_available_directions(Square& square)
 {
   std::vector<Board::Direction> available_directions;
   Square::Player sq_occupant = square.get_occupant();
+
   if (sq_occupant == Square::NONE)
   {
     return available_directions;
   }
 
   Square::Player sq_opponent = toggle_player(sq_occupant);
-
-// check to see if movement on 8 directions is within boundaries first
-// then check the board to make sure at last one adjacent space is available
+  // check to see if movement on 8 directions is within boundaries first
+  // then check the board to make sure at last one adjacent space is available
   if (square.get_y() + 1 < SQUARE_DIMENSION &&
     (*board)[square.get_x()][square.get_y() + 1]->get_occupant() != sq_opponent)
   {
     available_directions.push_back(Board::NORTH);
   }
 
-  if (square.get_y() - 1 < SQUARE_DIMENSION &&
+  if (square.get_y() - 1 >= 0 &&
     (*board)[square.get_x()][square.get_y() - 1]->get_occupant() != sq_opponent)
   {
     available_directions.push_back(Board::SOUTH);
@@ -80,7 +89,7 @@ Board::find_available_directions(Square& square)
     available_directions.push_back(Board::EAST);
   }
 
-  if (square.get_x() - 1 < SQUARE_DIMENSION &&
+  if (square.get_x() - 1 >= 0 &&
     (*board)[square.get_x() - 1][square.get_y()]->get_occupant() != sq_opponent)
   {
     available_directions.push_back(Board::WEST);
@@ -95,14 +104,14 @@ Board::find_available_directions(Square& square)
   }
 
   if (square.get_x() + 1 < SQUARE_DIMENSION &&
-    square.get_y() - 1 < SQUARE_DIMENSION &&
+    square.get_y() - 1 >= 0 &&
       (*board)[square.get_x() + 1][square.get_y() - 1]->get_occupant()
         != sq_opponent)
   {
     available_directions.push_back(Board::SOUTH_EAST);
   }
 
-  if (square.get_x() - 1 < SQUARE_DIMENSION &&
+  if (square.get_x() - 1 >= 0 &&
     square.get_y() + 1 < SQUARE_DIMENSION &&
       (*board)[square.get_x() - 1][square.get_y() + 1]->get_occupant()
         != sq_opponent)
@@ -110,8 +119,8 @@ Board::find_available_directions(Square& square)
     available_directions.push_back(Board::NORTH_WEST);
   }
 
-  if (square.get_x() - 1 < SQUARE_DIMENSION &&
-    square.get_y() - 1 < SQUARE_DIMENSION &&
+  if (square.get_x() - 1 >= 0 &&
+    square.get_y() - 1 >= 0 &&
       (*board)[square.get_x() - 1][square.get_y() - 1]->get_occupant()
         != sq_opponent)
   {
@@ -241,6 +250,8 @@ Board* Board::travel(Square& square, Board::Direction direction)
 
 void Board::print_board()
 {
+  printf("\nPlayer to move: %s\n", current_player == Square::BLACK ? "BLACK" : "WHITE");
+
   const char* hyphens = std::string(SQUARE_DIMENSION * 6 - 1, '-').c_str();
   printf(" %s\n", hyphens);
 
@@ -296,7 +307,7 @@ int Board::evaluate(Square::Player evalate_for_player)
     {
       if ((*board)[i][j]->get_num_stones() > 1)
       {
-        if ((*board)[i][j]->get_occupant() == current_player)
+        if ((*board)[i][j]->get_occupant() == evalate_for_player)
         {
           player_score = (find_available_directions(*(*board)[i][j])).size();
         } else
@@ -307,4 +318,89 @@ int Board::evaluate(Square::Player evalate_for_player)
     }
   }
   return (player_score - opponent_score);
+}
+
+void Board::do_best_move()
+{
+  int best_score = INT_MIN;
+  Board* best_board = 0;
+
+  for (int x = 0; x < SQUARE_DIMENSION; ++x)
+  {
+    for (int y = 0; y < SQUARE_DIMENSION; ++y)
+    {
+      if ((*board)[x][y]->get_occupant() == current_player)
+      {
+        std::vector<Board::Direction> available_directions = find_available_directions(*(*board)[x][y]);
+
+        for (int i = 0; i < available_directions.size(); ++i)
+        {
+          Board* new_board = travel(*(*board)[x][y], available_directions[i]);
+
+          int new_board_min_score = new_board->min_possible_score(current_player);
+
+          if (best_score < new_board_min_score) {
+            best_score = new_board_min_score;
+
+            delete best_board;
+            best_board = new_board;
+          } else
+          {
+            delete new_board;
+          }
+        }
+      }
+    }
+  }
+
+  if (best_board)
+  {
+    for (int x = 0; x < SQUARE_DIMENSION; ++x)
+    {
+      for (int y = 0; y < SQUARE_DIMENSION; ++y)
+      {
+        (*board)[x][y]->set_occupant((*(best_board->board))[x][y]->get_occupant());
+        (*board)[x][y]->set_num_stones((*(best_board->board))[x][y]->get_num_stones());
+      }
+    }
+
+    delete best_board;
+
+    current_player = toggle_player(current_player);
+  } else
+  {
+    // No moves possible
+    printf("Player %s has won", current_player == Square::BLACK ? "WHITE" : "BLACK");
+  }
+}
+
+int Board::min_possible_score(Square::Player for_player)
+{
+  int worst_score = INT_MAX;
+
+  for (int x = 0; x < SQUARE_DIMENSION; ++x)
+  {
+    for (int y = 0; y < SQUARE_DIMENSION; ++y)
+    {
+      if ((*board)[x][y]->get_occupant() == current_player)
+      {
+        std::vector<Board::Direction> available_directions = find_available_directions(*(*board)[x][y]);
+
+        for (int i = 0; i < available_directions.size(); ++i)
+        {
+          Board* new_board = travel(*(*board)[x][y], available_directions[i]);
+          int new_board_score = new_board->evaluate(for_player);
+
+          delete new_board;
+
+          if (new_board_score < worst_score)
+          {
+            worst_score = new_board_score;
+          }
+        }
+      }
+    }
+  }
+
+  return worst_score;
 }

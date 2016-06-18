@@ -32,6 +32,8 @@ public:
 
   void simulate_game();
   void print_board();
+  void do_best_move();
+  int min_possible_score(Square::Player);
 
 private:
   CongaBoard* board;
@@ -43,6 +45,7 @@ private:
   std::vector<Direction> find_available_directions(Square&);
   Board* travel(Square&, Direction);
   int evaluate(Square::Player);
+  void min_max();
 };
 
 #endif //__BOARD_HPP__
