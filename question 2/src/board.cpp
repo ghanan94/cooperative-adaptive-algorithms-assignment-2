@@ -258,7 +258,53 @@ void Board::print_board()
   printf(" %s\n", hyphens);
 }
 
+//Evaluate function 1
+//The idea is this: the game score of the board is the number of moves
+//with squares_with_Multistone you may
+//make minus the number of moves your opponent may make
+/*
+-----------------------
+| B10 | E0  | E0  | E0  |
+| E0  | E0  | E0  | E0  |
+| E0  | E0  | E0  | E0  |
+| E0  | E0  | E0  | W10 |
+ -----------------------
+
+ is a gamescore of 0 (3 - 3)
+
+ -----------------------
+| E0 | E0  | E0  | E0  |
+| B1 | E0  | E0  | E0  |
+| B2 | E0  | E0  | E0  |
+| B7 | W9  | W1  | E0  |
+-----------------------
+ is a gamescore of 1 (4 - 3)
+ -----------------------
+| B0 | E0  | E0  | B1  |
+| B1 | E0  | B2  | W1  |
+| B2 | B4  | W8  | E0  |
+| B0 | E0  | E1  | W0  |
+-----------------------
+is a gamescore of 7 (13 - 6)
+*/
 int Board::evaluate(Square::Player evalate_for_player)
 {
-  return 0;
+  int player_score, opponent_score;
+  for (int i = 0; i < SQUARE_DIMENSION; ++i)
+  {
+    for (int j = 0; j < SQUARE_DIMENSION; ++j)
+    {
+      if ((*board)[i][j]->get_num_stones() > 1)
+      {
+        if ((*board)[i][j]->get_occupant() == current_player)
+        {
+          player_score = (find_available_directions(*(*board)[i][j])).size();
+        } else
+        {
+          opponent_score = (find_available_directions(*(*board)[i][j])).size();
+        }
+      }
+    }
+  }
+  return (player_score - opponent_score);
 }
