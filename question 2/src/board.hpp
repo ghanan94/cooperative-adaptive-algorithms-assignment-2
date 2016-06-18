@@ -31,6 +31,7 @@ public:
   ~Board();
 
   void simulate_game();
+  void print_board();
 
 private:
   CongaBoard* board;

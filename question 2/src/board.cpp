@@ -1,6 +1,8 @@
 // Implementation file for Board class
 //@file board.cpp
 #include "board.hpp"
+#include <string>
+#include <iostream>
 
 Board::Board():
 current_player(Square::BLACK)
@@ -187,7 +189,8 @@ Board* Board::travel(Square& square, Board::Direction direction)
       break;
   }
 
-  for (int i = 1; i <= SQUARE_DIMENSION; ++i) {
+  for (int i = 1; i <= SQUARE_DIMENSION; ++i)
+  {
     int sq_num_stones = (*new_board)[x][y]->get_num_stones();
     int y_i = y + i * delta_y;
     int x_i = x + i * delta_x;
@@ -227,4 +230,23 @@ Board* Board::travel(Square& square, Board::Direction direction)
   }
 
   return new Board(new_board, sq_opponent);
+}
+
+void Board::print_board()
+{
+  const char* hyphens = std::string(SQUARE_DIMENSION * 6 - 1, '-').c_str();
+  printf(" %s\n", hyphens);
+
+  for (int y = SQUARE_DIMENSION - 1; y >= 0; --y)
+  {
+    for (int x = 0; x < SQUARE_DIMENSION; ++x)
+    {
+      Square* sq = (*board)[x][y];
+      printf("| %s%-2d ", sq->get_occupant() == Square::BLACK ? "B" : "W", sq->get_num_stones());
+    }
+
+    printf("|\n");
+  }
+
+  printf(" %s\n", hyphens);
 }
