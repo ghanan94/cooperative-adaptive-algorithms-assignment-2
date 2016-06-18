@@ -34,9 +34,13 @@ public:
 
 private:
   CongaBoard* board;
+  Square::Player current_player;
+
+  Board(CongaBoard*, Square::Player);
 
   Square::Player toggle_player(Square::Player);
   std::vector<Direction> find_available_directions(Square&);
+  Board* travel(Square&, Direction);
 };
 
 #endif //__BOARD_HPP__
