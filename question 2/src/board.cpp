@@ -211,8 +211,8 @@ Board* Board::travel(Square& square, Board::Direction direction)
       // We have hit an opponent square or end of board so put all the
       // remaining stones on previous square
       (*new_board)[x_i - delta_x][y_i - delta_y]->set_num_stones((*new_board)[x_i - delta_x][y_i - delta_y]->get_num_stones() + sq_num_stones);
-      sq_num_stones = 0;
-      (*new_board)[x][y]->set_num_stones(sq_num_stones);
+      (*new_board)[x][y]->set_num_stones(0);
+      (*new_board)[x][y]->set_occupant(Square::NONE);
       break;
     } else
     {
@@ -220,12 +220,19 @@ Board* Board::travel(Square& square, Board::Direction direction)
       {
         sq_num_stones -= i;
         (*new_board)[x_i][y_i]->set_num_stones((*new_board)[x_i][y_i]->get_num_stones() + i);
-      } else {
+      } else
+      {
         (*new_board)[x_i][y_i]->set_num_stones((*new_board)[x_i][y_i]->get_num_stones() + sq_num_stones);
         sq_num_stones = 0;
       }
 
       (*new_board)[x][y]->set_num_stones(sq_num_stones);
+      (*new_board)[x_i][y_i]->set_occupant(current_player);
+
+      if (sq_num_stones == 0)
+      {
+        (*new_board)[x][y]->set_occupant(Square::NONE);
+      }
     }
   }
 
@@ -242,7 +249,7 @@ void Board::print_board()
     for (int x = 0; x < SQUARE_DIMENSION; ++x)
     {
       Square* sq = (*board)[x][y];
-      printf("| %s%-2d ", sq->get_occupant() == Square::BLACK ? "B" : "W", sq->get_num_stones());
+      printf("| %s%-2d ", sq->get_occupant() == Square::BLACK ? "B" : (sq->get_occupant() == Square::WHITE ? "W" : "E"), sq->get_num_stones());
     }
 
     printf("|\n");
