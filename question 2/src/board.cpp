@@ -143,6 +143,7 @@ Board* Board::travel(Square& square, Board::Direction direction)
 
   Square::Player sq_opponent = toggle_player(current_player);
   int delta_y = 0;
+  int delta_x = 0;
 
   switch (direction)
   {
@@ -155,9 +156,11 @@ Board* Board::travel(Square& square, Board::Direction direction)
       break;
 
     case EAST:
+      delta_x = 1;
       break;
 
     case WEST:
+      delta_x = -1;
       break;
 
     case NORTH_EAST:
@@ -179,10 +182,13 @@ Board* Board::travel(Square& square, Board::Direction direction)
   for (int i = 1; i <= SQUARE_DIMENSION; ++i) {
     int sq_num_stones = (*new_board)[x][y]->get_num_stones();
     int delta_y_i = i * delta_y;
+    int delta_x_i = i * delta_x;
 
     if (y + delta_y_i >= SQUARE_DIMENSION ||
       y + delta_y_i < 0 ||
-      (*new_board)[x][y + delta_y_i]->get_occupant() == sq_opponent)
+      x + delta_x_i >= SQUARE_DIMENSION ||
+      x + delta_x_i < 0 ||
+      (*new_board)[x + delta_x_i][y + delta_y_i]->get_occupant() == sq_opponent)
     {
       if (i == 1)
       {
@@ -193,7 +199,7 @@ Board* Board::travel(Square& square, Board::Direction direction)
 
       // We have hit an opponent square or end of board so put all the
       // remaining stones on previous square
-      (*new_board)[x][y + delta_y_i - delta_y]->set_num_stones((*new_board)[x][y + delta_y_i - delta_y]->get_num_stones() + sq_num_stones);
+      (*new_board)[x + delta_x_i - delta_x][y + delta_y_i - delta_y]->set_num_stones((*new_board)[x + delta_x_i - delta_x][y + delta_y_i - delta_y]->get_num_stones() + sq_num_stones);
       sq_num_stones = 0;
       (*new_board)[x][y]->set_num_stones(sq_num_stones);
       break;
@@ -202,9 +208,9 @@ Board* Board::travel(Square& square, Board::Direction direction)
       if (sq_num_stones >= i)
       {
         sq_num_stones -= i;
-        (*new_board)[x][y + delta_y_i]->set_num_stones((*new_board)[x][y + delta_y_i]->get_num_stones() + i);
+        (*new_board)[x + delta_x_i][y + delta_y_i]->set_num_stones((*new_board)[x + delta_x_i][y + delta_y_i]->get_num_stones() + i);
       } else {
-        (*new_board)[x][y + delta_y_i]->set_num_stones((*new_board)[x][y + delta_y_i]->get_num_stones() + sq_num_stones);
+        (*new_board)[x + delta_x_i][y + delta_y_i]->set_num_stones((*new_board)[x + delta_x_i][y + delta_y_i]->get_num_stones() + sq_num_stones);
         sq_num_stones = 0;
       }
 
