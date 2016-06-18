@@ -142,46 +142,16 @@ Board* Board::travel(Square& square, Board::Direction direction)
   }
 
   Square::Player sq_opponent = toggle_player(current_player);
+  int delta_y = 0;
 
   switch (direction)
   {
     case NORTH:
-      for (int i = 1; i <= SQUARE_DIMENSION; ++i) {
-        int sq_num_stones = (*new_board)[x][y]->get_num_stones();
-
-        if (y + i >= SQUARE_DIMENSION ||
-          (*new_board)[x][y + i]->get_occupant() == sq_opponent)
-        {
-          if (i == 1)
-          {
-            // this should not happen
-            printf("i == 1 in travel breaking\n");
-            break;
-          }
-
-          // We have hit an opponent square or end of board so put all the
-          // remaining stones on previous square
-          (*new_board)[x][y + i - 1]->set_num_stones((*new_board)[x][y + i - 1]->get_num_stones() + sq_num_stones);
-          sq_num_stones = 0;
-          (*new_board)[x][y]->set_num_stones(sq_num_stones);
-          break;
-        } else
-        {
-          if (sq_num_stones >= i)
-          {
-            sq_num_stones -= i;
-            (*new_board)[x][y + i]->set_num_stones((*new_board)[x][y + i]->get_num_stones() + i);
-          } else {
-            (*new_board)[x][y + i]->set_num_stones((*new_board)[x][y + i]->get_num_stones() + sq_num_stones);
-            sq_num_stones = 0;
-          }
-
-          (*new_board)[x][y]->set_num_stones(sq_num_stones);
-        }
-      }
+      delta_y = 1;
       break;
 
     case SOUTH:
+      delta_y = -1;
       break;
 
     case EAST:
@@ -204,6 +174,42 @@ Board* Board::travel(Square& square, Board::Direction direction)
 
     default:
       break;
+  }
+
+  for (int i = 1; i <= SQUARE_DIMENSION; ++i) {
+    int sq_num_stones = (*new_board)[x][y]->get_num_stones();
+    int delta_y_i = i * delta_y;
+
+    if (y + delta_y_i >= SQUARE_DIMENSION ||
+      y + delta_y_i < 0 ||
+      (*new_board)[x][y + delta_y_i]->get_occupant() == sq_opponent)
+    {
+      if (i == 1)
+      {
+        // this should not happen
+        printf("i == 1 in travel breaking\n");
+        break;
+      }
+
+      // We have hit an opponent square or end of board so put all the
+      // remaining stones on previous square
+      (*new_board)[x][y + delta_y_i - delta_y]->set_num_stones((*new_board)[x][y + delta_y_i - delta_y]->get_num_stones() + sq_num_stones);
+      sq_num_stones = 0;
+      (*new_board)[x][y]->set_num_stones(sq_num_stones);
+      break;
+    } else
+    {
+      if (sq_num_stones >= i)
+      {
+        sq_num_stones -= i;
+        (*new_board)[x][y + delta_y_i]->set_num_stones((*new_board)[x][y + delta_y_i]->get_num_stones() + i);
+      } else {
+        (*new_board)[x][y + delta_y_i]->set_num_stones((*new_board)[x][y + delta_y_i]->get_num_stones() + sq_num_stones);
+        sq_num_stones = 0;
+      }
+
+      (*new_board)[x][y]->set_num_stones(sq_num_stones);
+    }
   }
 
   return new Board(new_board, sq_opponent);
