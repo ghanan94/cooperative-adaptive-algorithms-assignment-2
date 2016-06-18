@@ -40,6 +40,7 @@ public:
 private:
   CongaBoard* board;
   Square::Player current_player;
+  bool game_over;
 
   Board(CongaBoard*, Square::Player);
 
@@ -48,6 +49,7 @@ private:
   Board* travel(Square&, Direction);
   int evaluate(Square::Player);
   void min_max();
+  void advance_board(CongaBoard*);
 };
 
 #endif //__BOARD_HPP__

@@ -8,7 +8,8 @@
 #include <random>
 
 Board::Board():
-current_player(Square::BLACK)
+current_player(Square::BLACK),
+game_over(false)
 {
   std::srand(time(0));
 
@@ -37,7 +38,8 @@ current_player(Square::BLACK)
 
 Board::Board(CongaBoard* board, Square::Player current_player):
 board(board),
-current_player(current_player) {}
+current_player(current_player),
+game_over(false) {}
 
 Board::~Board()
 {
@@ -54,6 +56,33 @@ Board::~Board()
 
 void Board::simulate_game()
 {
+  print_board();
+
+  while (!game_over)
+  {
+    switch (current_player)
+    {
+      case Square::BLACK:
+        do_best_move();
+        break;
+
+      case Square::WHITE:
+        do_random_move();
+        break;
+
+      default:
+        printf("default in simulate_game?\n");
+        break;
+    }
+
+    print_board();
+
+    if (game_over)
+    {
+      printf("Game over\n");
+      break;
+    }
+  }
 }
 
 Square::Player Board::toggle_player(Square::Player curr_player)
@@ -359,22 +388,14 @@ void Board::do_best_move()
 
   if (best_board)
   {
-    for (int x = 0; x < SQUARE_DIMENSION; ++x)
-    {
-      for (int y = 0; y < SQUARE_DIMENSION; ++y)
-      {
-        (*board)[x][y]->set_occupant((*(best_board->board))[x][y]->get_occupant());
-        (*board)[x][y]->set_num_stones((*(best_board->board))[x][y]->get_num_stones());
-      }
-    }
+    advance_board(best_board->board);
 
     delete best_board;
-
-    current_player = toggle_player(current_player);
   } else
   {
     // No moves possible
-    printf("Player %s has won", current_player == Square::BLACK ? "WHITE" : "BLACK");
+    printf("Player %s has won\n", current_player == Square::BLACK ? "WHITE" : "BLACK");
+    game_over = true;
   }
 }
 
@@ -447,16 +468,26 @@ void Board::do_random_move()
 
   if (new_board)
   {
-    for (int x = 0; x < SQUARE_DIMENSION; ++x)
-    {
-      for (int y = 0; y < SQUARE_DIMENSION; ++y)
-      {
-        (*board)[x][y]->set_occupant((*(new_board->board))[x][y]->get_occupant());
-        (*board)[x][y]->set_num_stones((*(new_board->board))[x][y]->get_num_stones());
-      }
-    }
-
-    current_player = toggle_player(current_player);
+    advance_board(new_board->board);
     delete new_board;
+  } else
+  {
+    // No moves possible
+    printf("Player %s has won\n", current_player == Square::BLACK ? "WHITE" : "BLACK");
+    game_over = true;
   }
+}
+
+void Board::advance_board(CongaBoard* new_conga_board)
+{
+  for (int x = 0; x < SQUARE_DIMENSION; ++x)
+  {
+    for (int y = 0; y < SQUARE_DIMENSION; ++y)
+    {
+      (*board)[x][y]->set_occupant((*new_conga_board)[x][y]->get_occupant());
+      (*board)[x][y]->set_num_stones((*new_conga_board)[x][y]->get_num_stones());
+    }
+  }
+
+  current_player = toggle_player(current_player);
 }
