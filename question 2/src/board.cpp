@@ -4,10 +4,14 @@
 #include <string>
 #include <iostream>
 #include <climits>
+#include <ctime>
+#include <random>
 
 Board::Board():
 current_player(Square::BLACK)
 {
+  std::srand(time(0));
+
   board = new CongaBoard();
   for (int x = 0; x < SQUARE_DIMENSION; ++x)
   {
@@ -403,4 +407,56 @@ int Board::min_possible_score(Square::Player for_player)
   }
 
   return worst_score;
+}
+
+Square::Player Board::get_current_player()
+{
+  return current_player;
+}
+
+void Board::do_random_move()
+{
+  Board* new_board = 0;
+
+  for (int x = 0; x < SQUARE_DIMENSION; ++x)
+  {
+    for (int y = 0; y < SQUARE_DIMENSION; ++y)
+    {
+      if ((*board)[x][y]->get_occupant() == current_player)
+      {
+        std::vector<Board::Direction> available_directions = find_available_directions(*(*board)[x][y]);
+        int count_directions = available_directions.size();
+
+        if (count_directions == 0)
+        {
+          continue;
+        }
+
+        int direction_idx = rand() % count_directions;
+
+        new_board = travel(*(*board)[x][y], available_directions[direction_idx]);
+        break;
+      }
+    }
+
+    if (new_board)
+    {
+      break;
+    }
+  }
+
+  if (new_board)
+  {
+    for (int x = 0; x < SQUARE_DIMENSION; ++x)
+    {
+      for (int y = 0; y < SQUARE_DIMENSION; ++y)
+      {
+        (*board)[x][y]->set_occupant((*(new_board->board))[x][y]->get_occupant());
+        (*board)[x][y]->set_num_stones((*(new_board->board))[x][y]->get_num_stones());
+      }
+    }
+
+    current_player = toggle_player(current_player);
+    delete new_board;
+  }
 }

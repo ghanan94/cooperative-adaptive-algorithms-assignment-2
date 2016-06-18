@@ -34,6 +34,8 @@ public:
   void print_board();
   void do_best_move();
   int min_possible_score(Square::Player);
+  Square::Player get_current_player();
+  void do_random_move();
 
 private:
   CongaBoard* board;
