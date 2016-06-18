@@ -211,9 +211,7 @@ Board* Board::travel(Square& square, Board::Direction direction)
       // We have hit an opponent square or end of board so put all the
       // remaining stones on previous square
       (*new_board)[x_i - delta_x][y_i - delta_y]->set_num_stones((*new_board)[x_i - delta_x][y_i - delta_y]->get_num_stones() + sq_num_stones);
-      (*new_board)[x][y]->set_num_stones(0);
-      (*new_board)[x][y]->set_occupant(Square::NONE);
-      break;
+      sq_num_stones = 0;
     } else
     {
       if (sq_num_stones >= i)
@@ -226,13 +224,15 @@ Board* Board::travel(Square& square, Board::Direction direction)
         sq_num_stones = 0;
       }
 
-      (*new_board)[x][y]->set_num_stones(sq_num_stones);
       (*new_board)[x_i][y_i]->set_occupant(current_player);
+    }
 
-      if (sq_num_stones == 0)
-      {
-        (*new_board)[x][y]->set_occupant(Square::NONE);
-      }
+    (*new_board)[x][y]->set_num_stones(sq_num_stones);
+
+    if (sq_num_stones == 0)
+    {
+      (*new_board)[x][y]->set_occupant(Square::NONE);
+      break;
     }
   }
 
@@ -256,4 +256,9 @@ void Board::print_board()
   }
 
   printf(" %s\n", hyphens);
+}
+
+int Board::evaluate(Square::Player evalate_for_player)
+{
+  return 0;
 }

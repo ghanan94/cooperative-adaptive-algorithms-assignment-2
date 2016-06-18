@@ -42,6 +42,7 @@ private:
   Square::Player toggle_player(Square::Player);
   std::vector<Direction> find_available_directions(Square&);
   Board* travel(Square&, Direction);
+  int evaluate(Square::Player);
 };
 
 #endif //__BOARD_HPP__
