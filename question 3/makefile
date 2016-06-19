@@ -10,7 +10,7 @@ all: default
 
 HEADERS = $(wildcard $(SOURCE_DIR)/*.hpp)
 
-GENERATE_OBJECTS = $(OBJECT_DIR)/main.o
+GENERATE_OBJECTS = $(OBJECT_DIR)/main.o $(OBJECT_DIR)/qap.o
 
 $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.cpp $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@

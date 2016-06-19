@@ -1,0 +1,29 @@
+// Prototype of QAP
+//@file qap.hpp
+#ifndef __QAP_HPP__
+#define __QAP_HPP__
+
+#define NUM_OBJECTS 20
+
+#include <string>
+#include <vector>
+
+class QAP
+{
+  typedef std::vector<std::vector<int>> Table;
+  
+public:
+  QAP(std::string, std::string);
+  ~QAP();
+  void print_flow_table();
+  void print_distance_table();
+
+private:
+  Table flow_table;
+  Table distance_table;
+
+  void parse_flow_distance_table_file(Table&, std::string);
+  void print_table(Table&);
+};
+
+#endif // __QAP_HPP__
