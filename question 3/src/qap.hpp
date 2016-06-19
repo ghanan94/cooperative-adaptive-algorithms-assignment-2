@@ -5,6 +5,7 @@
 
 #define NUM_OBJECTS 20
 #define TABU_TENURE 3
+#define SEARCH_END_COUNT 100
 
 #include <string>
 #include <vector>
@@ -32,6 +33,7 @@ private:
   bool tabu_check(int, int);
   void tabu_reset();
   void print_solution(std::vector<int>&);
+  std::vector<int> find_best_move(std::vector<int>);
 };
 
 #endif // __QAP_HPP__

@@ -1,6 +1,7 @@
 #include "qap.hpp"
 #include <fstream> // std::ifstream, std::getline
 #include <sstream> // std::stringstream
+#include <climits>
 
 QAP::QAP(std::string flow_table_file_path, std::string distance_table_file_path)
 {
@@ -92,13 +93,33 @@ int QAP::evaluate_cost(std::vector<int> &assignment)
 std::vector<int> QAP::solve()
 {
   std::vector<int> solution;
-
-  tabu_reset();
+  int solution_cost = 0;
+  unsigned int counter = 0;
 
   // Initial solution
   for (int i = 0; i < NUM_OBJECTS; ++i)
   {
     solution.push_back(i);
+  }
+
+  solution_cost = evaluate_cost(solution);
+
+  // Reset Tabu table
+  tabu_reset();
+
+  while (counter < SEARCH_END_COUNT)
+  {
+    std::vector<int> temp_solution = find_best_move(solution);
+    int temp_solution_cost = evaluate_cost(temp_solution);
+
+    if (temp_solution_cost < solution_cost)
+    {
+      solution_cost = temp_solution_cost;
+      solution = temp_solution;
+      counter = 0;
+    } else {
+      ++counter;
+    }
   }
 
   print_solution(solution);
@@ -161,4 +182,65 @@ void QAP::print_solution(std::vector<int>& solution)
   }
 
   printf("Cost: %d\n", evaluate_cost(solution));
+}
+
+std::vector<int> QAP::find_best_move(std::vector<int> solution)
+{
+  int temp;
+  int best_i = -1;
+  int best_j = -1;
+  int best_tabu_i = -1;
+  int best_tabu_j = -1;
+  int best_cost = INT_MAX;
+  int best_tabu_cost = INT_MAX;
+
+  for (int i = 0; i < NUM_OBJECTS; ++i)
+  {
+    for (int j = i + 1; j < NUM_OBJECTS; ++j)
+    {
+      // Do a swap
+      temp = solution[i];
+      solution[i] = solution[j];
+      solution[j] = temp;
+
+      int temp_cost = evaluate_cost(solution);
+
+      if (tabu_check(i, j))
+      {
+        // TABU
+        if (temp_cost < best_cost)
+        {
+          best_cost = temp_cost;
+          best_i = i;
+          best_j = j;
+        }
+      } else
+      {
+        if (temp_cost < best_tabu_cost)
+        {
+          best_tabu_cost = temp_cost;
+          best_tabu_i = i;
+          best_tabu_j = j;
+        }
+      }
+
+      // Switch back
+      temp = solution[i];
+      solution[i] = solution[j];
+      solution[j] = temp;
+    }
+  }
+
+  if (best_i == -1)
+  {
+    temp = solution[best_tabu_i];
+    solution[best_tabu_i] = solution[best_tabu_j];
+    solution[best_tabu_j] = temp;
+  } else {
+    temp = solution[best_i];
+    solution[best_i] = solution[best_j];
+    solution[best_j] = temp;
+  }
+
+  return solution;
 }
