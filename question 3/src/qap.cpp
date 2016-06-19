@@ -93,12 +93,61 @@ std::vector<int> QAP::solve()
 {
   std::vector<int> solution;
 
+  tabu_reset();
+
+  // Initial solution
   for (int i = 0; i < NUM_OBJECTS; ++i)
   {
     solution.push_back(i);
   }
 
-    printf("cost: %d\n", evaluate_cost(solution));
+  printf("cost: %d\n", evaluate_cost(solution));
 
   return solution;
+}
+
+void QAP::tabu_add(int i, int j)
+{
+  if (i == j)
+  {
+    return;
+  } else if (i > j)
+  {
+    tabu_table[j][i - j - 1] = TABU_TENURE;
+  } else
+  {
+    tabu_table[i][j - i - 1] = TABU_TENURE;
+  }
+}
+
+void QAP::tabu_reset()
+{
+  tabu_table.clear();
+
+  for (int i = 0; i < NUM_OBJECTS; ++i)
+  {
+    std::vector<int> row;
+
+    for (int j = i + 1; j < NUM_OBJECTS; ++j)
+    {
+      row.push_back(0);
+    }
+
+    tabu_table.push_back(row);
+  }
+}
+
+bool QAP::tabu_check(int i, int j)
+{
+  if (i == j)
+  {
+    // should never do this swap since same positions
+    return true;
+  } else if (i > j)
+  {
+    return tabu_table[j][i - j - i] > 0;
+  } else
+  {
+    return tabu_table[i][j - i - 1] > 0;
+  }
 }
