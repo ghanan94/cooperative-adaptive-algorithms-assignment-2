@@ -75,3 +75,30 @@ void QAP::print_distance_table()
   printf("\nDistance Table:\n");
   print_table(distance_table);
 }
+
+int QAP::evaluate_cost(std::vector<int> &assignment)
+{
+  int cost = 0;
+
+  for (int i = 0; i < NUM_OBJECTS; ++i){
+    for (int j = i + 1; j < NUM_OBJECTS; ++j){
+      cost += flow_table[assignment[i]][assignment[j]] * distance_table[i][j];
+    }
+  }
+
+  return cost;
+}
+
+std::vector<int> QAP::solve()
+{
+  std::vector<int> solution;
+
+  for (int i = 0; i < NUM_OBJECTS; ++i)
+  {
+    solution.push_back(i);
+  }
+
+    printf("cost: %d\n", evaluate_cost(solution));
+
+  return solution;
+}

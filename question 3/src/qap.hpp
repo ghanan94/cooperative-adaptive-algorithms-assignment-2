@@ -11,12 +11,13 @@
 class QAP
 {
   typedef std::vector<std::vector<int>> Table;
-  
+
 public:
   QAP(std::string, std::string);
   ~QAP();
   void print_flow_table();
   void print_distance_table();
+  std::vector<int> solve();
 
 private:
   Table flow_table;
@@ -24,6 +25,7 @@ private:
 
   void parse_flow_distance_table_file(Table&, std::string);
   void print_table(Table&);
+  int evaluate_cost(std::vector<int>&);
 };
 
 #endif // __QAP_HPP__
