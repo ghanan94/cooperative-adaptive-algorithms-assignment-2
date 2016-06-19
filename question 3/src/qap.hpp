@@ -31,6 +31,7 @@ private:
   void tabu_add(int, int);
   bool tabu_check(int, int);
   void tabu_reset();
+  void print_solution(std::vector<int>&);
 };
 
 #endif // __QAP_HPP__

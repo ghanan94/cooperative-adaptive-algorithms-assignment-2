@@ -101,7 +101,7 @@ std::vector<int> QAP::solve()
     solution.push_back(i);
   }
 
-  printf("cost: %d\n", evaluate_cost(solution));
+  print_solution(solution);
 
   return solution;
 }
@@ -150,4 +150,15 @@ bool QAP::tabu_check(int i, int j)
   {
     return tabu_table[i][j - i - 1] > 0;
   }
+}
+
+void QAP::print_solution(std::vector<int>& solution)
+{
+  printf("\nSolution:\n");
+
+  for (int j = 0; j < NUM_OBJECTS; ++j){
+    printf("Site%-3d: Object%-3d\n", j, solution[j]);
+  }
+
+  printf("Cost: %d\n", evaluate_cost(solution));
 }
