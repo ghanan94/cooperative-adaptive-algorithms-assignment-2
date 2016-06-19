@@ -559,27 +559,29 @@ void Maze::parse_maze_file(const std::string file_name)
     std::getline(maze_file, line);
     std::stringstream linestream_start(line);
     std::getline(linestream_start, data, ' ');
-    linestream_start >> s_x;
-    linestream_start >> s_y;
+    s_x = std::stoi(data);
+    std::getline(linestream_start, data, ' ');
+    s_y = std::stoi(data);
 
     // Get end location; x y
     std::getline(maze_file, line);
     std::stringstream linestream_end(line);
     std::getline(linestream_end, data, ' ');
-    linestream_end >> e_x;
-    linestream_end >> e_y;
+    e_x = std::stoi(data);
+    std::getline(linestream_end, data, ' ');
+    e_y = std::stoi(data);
 
     // Parse maze; 0 = not blocked; 1 = blocked
     for (int y = SQUARE_DIMENSION - 1; y >= 0; --y)
     {
       std::getline(maze_file, line);
       std::stringstream linestream(line);
-      std::getline(linestream, data, ' ');
 
       for (int x = 0; x < SQUARE_DIMENSION; ++x)
       {
+        std::getline(linestream, data, ' ');
         bool is_blocked;
-        linestream >> is_blocked;
+        is_blocked = data[0] != '0';
 
         Point* new_point = new Point(x, y, is_blocked);
         (*maze)[y].push_back(new_point);
