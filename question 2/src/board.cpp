@@ -56,6 +56,8 @@ Board::~Board()
 
 void Board::simulate_game()
 {
+  unsigned int moves = 0;
+
   print_board();
 
   while (!game_over)
@@ -79,9 +81,11 @@ void Board::simulate_game()
 
     if (game_over)
     {
-      printf("Game over\n");
+      printf("Game over after %u moves\n", moves);
       break;
     }
+
+    ++moves;
   }
 }
 
