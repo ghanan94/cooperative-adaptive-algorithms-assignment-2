@@ -7,7 +7,7 @@
 #include <ctime>
 #include <random>
 
-#define MIN_MAX_TREE_DEPTH 2
+#define MIN_MAX_TREE_DEPTH 3
 
 Board::Board():
 current_player(Square::BLACK),
@@ -336,27 +336,116 @@ void Board::print_board()
 | B0 | E0  | E1  | W0  |
 -----------------------
 is a gamescore of 7 (13 - 6)
-*/
-int Board::evaluate(Square::Player evalate_for_player)
+
+int Board::evaluate(Square::Player evaluate_for_player)
 {
-  int player_score, opponent_score;
+  int player_score = 0;
+  int opponent_score = 0;
   for (int i = 0; i < SQUARE_DIMENSION; ++i)
   {
     for (int j = 0; j < SQUARE_DIMENSION; ++j)
     {
       if ((*board)[i][j]->get_num_stones() > 1)
       {
-        if ((*board)[i][j]->get_occupant() == evalate_for_player)
+        if ((*board)[i][j]->get_occupant() == evaluate_for_player)
         {
-          player_score = (find_available_directions(*(*board)[i][j])).size();
+          player_score += (find_available_directions(*(*board)[i][j])).size();
         } else
         {
-          opponent_score = (find_available_directions(*(*board)[i][j])).size();
+          opponent_score += (find_available_directions(*(*board)[i][j])).size();
         }
       }
     }
   }
   return (player_score - opponent_score);
+}*/
+
+//gamescore is based on the location of the opponents pieces
+/*
+-----------------------
+| 0 |  1  |  2  | 3  |
+| -1|  0  |  1  | 2  |
+| -2|  -1 |  0  | 1  |
+| -3|  -2 |  -1 | 0  |
+-----------------------
+
+int Board::evaluate(Square::Player evaluate_for_player)
+{
+  int player_score = 0;
+  for (int x = 0; x < SQUARE_DIMENSION; ++x)
+  {
+    for (int y = 0; y < SQUARE_DIMENSION; ++y)
+    {
+      if ((*board)[x][y]->get_occupant() == toggle_player(evaluate_for_player))
+      {
+        int indexSum = x + y;
+        switch(indexSum)
+        {
+          case (0):
+            player_score -= 3;
+            break;
+          case(1):
+            player_score -= 2;
+            break;
+          case(2):
+            player_score -= 1;
+            break;
+          case(4):
+            player_score += 1;
+            break;
+          case(5):
+            player_score += 2;
+            break;
+          case(6):
+            player_score += 3;
+            break;
+          default:
+            break;
+        }
+      }
+    }
+  }
+
+  return player_score;
+}*/
+// This evaluation is similar to the first one, without the requirement of >1
+//stones needed
+/*int Board::evaluate(Square::Player evaluate_for_player)
+{
+  int player_score = 0;
+  int opponent_score = 0;
+  for (int i = 0; i < SQUARE_DIMENSION; ++i)
+  {
+    for (int j = 0; j < SQUARE_DIMENSION; ++j)
+    {
+      if ((*board)[i][j]->get_occupant() == evaluate_for_player)
+      {
+        player_score += (find_available_directions(*(*board)[i][j])).size();
+      } else
+      {
+        opponent_score += (find_available_directions(*(*board)[i][j])).size();
+      }
+    }
+  }
+  return (player_score - opponent_score);
+}*/
+// this evaluation function only cares about the moves the opponent can make,
+// max score is 0 (win).
+int Board::evaluate(Square::Player evaluate_for_player)
+{
+  int player_score = 0;
+  Square::Player opponent = toggle_player(evaluate_for_player);
+  for (int i = 0; i < SQUARE_DIMENSION; ++i)
+  {
+    for (int j = 0; j < SQUARE_DIMENSION; ++j)
+    {
+      if ((*board)[i][j]->get_occupant() == opponent)
+      {
+        player_score -= (find_available_directions(*(*board)[i][j])).size();
+      }
+    }
+  }
+  return player_score;
 }
 
 void Board::do_best_move()
