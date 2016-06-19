@@ -7,6 +7,8 @@
 #include <ctime>
 #include <random>
 
+#define MIN_MAX_TREE_DEPTH 2
+
 Board::Board():
 current_player(Square::BLACK),
 game_over(false)
@@ -374,7 +376,7 @@ void Board::do_best_move()
         {
           Board* new_board = travel(*(*board)[x][y], available_directions[i]);
 
-          int new_board_min_score = new_board->min_possible_score(current_player);
+          int new_board_min_score = new_board->min_max_possible_score(current_player, true, MIN_MAX_TREE_DEPTH);
 
           if (best_score < new_board_min_score) {
             best_score = new_board_min_score;
@@ -403,9 +405,14 @@ void Board::do_best_move()
   }
 }
 
-int Board::min_possible_score(Square::Player for_player)
+int Board::min_max_possible_score(Square::Player for_player, bool calculate_min, unsigned int depth)
 {
-  int worst_score = INT_MAX;
+  if (depth == 0)
+  {
+    return evaluate(for_player);
+  }
+
+  int current_score = calculate_min ? INT_MAX : INT_MIN;
 
   for (int x = 0; x < SQUARE_DIMENSION; ++x)
   {
@@ -418,20 +425,23 @@ int Board::min_possible_score(Square::Player for_player)
         for (int i = 0; i < available_directions.size(); ++i)
         {
           Board* new_board = travel(*(*board)[x][y], available_directions[i]);
-          int new_board_score = new_board->evaluate(for_player);
+          int new_board_score = new_board->min_max_possible_score(for_player, !calculate_min, depth - 1);
 
           delete new_board;
 
-          if (new_board_score < worst_score)
+          if (calculate_min && new_board_score < current_score)
           {
-            worst_score = new_board_score;
+            current_score = new_board_score;
+          } else if (!calculate_min && new_board_score > current_score)
+          {
+            current_score = new_board_score;
           }
         }
       }
     }
   }
 
-  return worst_score;
+  return current_score;
 }
 
 Square::Player Board::get_current_player()
