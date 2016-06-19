@@ -8,6 +8,6 @@ int main(int argc, char *argv[])
   QAP qap("flow_distance_tables/Flow.csv", "flow_distance_tables//Distance.csv");
   qap.print_flow_table();
   qap.print_distance_table();
-  qap.solve();
+  qap.find_solution();
   return 0;
 }

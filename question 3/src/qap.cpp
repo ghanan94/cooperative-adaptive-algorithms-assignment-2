@@ -92,37 +92,90 @@ int QAP::evaluate_cost(std::vector<int> &assignment)
 
 std::vector<int> QAP::solve()
 {
-  std::vector<int> solution;
-  int solution_cost = 0;
+  // Below is just a random initial solution that will be improved on
+  std::vector<int> solution = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+  std::vector<int> intermediate_solution = solution;
+  int solution_cost = evaluate_cost(solution);
+  int intermediate_solution_cost = solution_cost;
   unsigned int counter = 0;
-
-  // Initial solution
-  for (int i = 0; i < NUM_OBJECTS; ++i)
-  {
-    solution.push_back(i);
-  }
-
-  solution_cost = evaluate_cost(solution);
 
   // Reset Tabu table
   tabu_reset();
 
   while (counter < SEARCH_END_COUNT)
   {
-    std::vector<int> temp_solution = find_best_move(solution);
-    int temp_solution_cost = evaluate_cost(temp_solution);
+    int temp;
+    int best_i = -1;
+    int best_j = -1;
+    int best_tabu_i = -1;
+    int best_tabu_j = -1;
+    int best_cost = INT_MAX;
+    int best_tabu_cost = INT_MAX;
 
-    if (temp_solution_cost < solution_cost)
+    for (int i = 0; i < NUM_OBJECTS; ++i)
     {
-      solution_cost = temp_solution_cost;
-      solution = temp_solution;
+      for (int j = i + 1; j < NUM_OBJECTS; ++j)
+      {
+        // Do a swap
+        temp = intermediate_solution[i];
+        intermediate_solution[i] = intermediate_solution[j];
+        intermediate_solution[j] = temp;
+
+        int temp_cost = evaluate_cost(intermediate_solution);
+
+        if (tabu_check(i, j))
+        {
+          // TABU
+          if (temp_cost < best_tabu_cost)
+          {
+            best_tabu_cost = temp_cost;
+            best_tabu_i = i;
+            best_tabu_j = j;
+          }
+        } else
+        {
+          if (temp_cost < best_cost)
+          {
+            best_cost = temp_cost;
+            best_i = i;
+            best_j = j;
+          }
+        }
+
+        // Switch back
+        temp = intermediate_solution[i];
+        intermediate_solution[i] = intermediate_solution[j];
+        intermediate_solution[j] = temp;
+      }
+    }
+
+    if (best_i == -1)
+    {
+      temp = intermediate_solution[best_tabu_i];
+      intermediate_solution[best_tabu_i] = intermediate_solution[best_tabu_j];
+      intermediate_solution[best_tabu_j] = temp;
+      intermediate_solution_cost = best_cost;
+
+      tabu_add(best_tabu_i, best_tabu_j);
+    } else
+    {
+      temp = intermediate_solution[best_i];
+      intermediate_solution[best_i] = intermediate_solution[best_j];
+      intermediate_solution[best_j] = temp;
+      intermediate_solution_cost = best_tabu_cost;
+
+      tabu_add(best_i, best_j);
+    }
+
+    if (intermediate_solution_cost < solution_cost) {
+      solution = intermediate_solution;
+      solution_cost = intermediate_solution_cost;
       counter = 0;
-    } else {
+    } else
+    {
       ++counter;
     }
   }
-
-  print_solution(solution);
 
   return solution;
 }
@@ -134,11 +187,27 @@ void QAP::tabu_add(int i, int j)
     return;
   } else if (i > j)
   {
-    tabu_table[j][i - j - 1] = TABU_TENURE;
+    tabu_table[j][i - j - 1] = TABU_TENURE + 1;
   } else
   {
-    tabu_table[i][j - i - 1] = TABU_TENURE;
+    tabu_table[i][j - i - 1] = TABU_TENURE + 1;
   }
+
+  /*printf("TABU TABLE:\n");
+  for (int a = 0; a < NUM_OBJECTS; ++a)
+  {
+    for (int b = a + 1; b < NUM_OBJECTS; ++b)
+    {
+      if (tabu_table[a][b - (a + 1)])
+      {
+        tabu_table[a][b - (a + 1)] -= 1;
+      }
+
+      printf("%d, ", tabu_table[a][b - (a + 1)]);
+    }
+
+    printf("\n");
+  }*/
 }
 
 void QAP::tabu_reset()
@@ -184,63 +253,8 @@ void QAP::print_solution(std::vector<int>& solution)
   printf("Cost: %d\n", evaluate_cost(solution));
 }
 
-std::vector<int> QAP::find_best_move(std::vector<int> solution)
+void QAP::find_solution()
 {
-  int temp;
-  int best_i = -1;
-  int best_j = -1;
-  int best_tabu_i = -1;
-  int best_tabu_j = -1;
-  int best_cost = INT_MAX;
-  int best_tabu_cost = INT_MAX;
-
-  for (int i = 0; i < NUM_OBJECTS; ++i)
-  {
-    for (int j = i + 1; j < NUM_OBJECTS; ++j)
-    {
-      // Do a swap
-      temp = solution[i];
-      solution[i] = solution[j];
-      solution[j] = temp;
-
-      int temp_cost = evaluate_cost(solution);
-
-      if (tabu_check(i, j))
-      {
-        // TABU
-        if (temp_cost < best_cost)
-        {
-          best_cost = temp_cost;
-          best_i = i;
-          best_j = j;
-        }
-      } else
-      {
-        if (temp_cost < best_tabu_cost)
-        {
-          best_tabu_cost = temp_cost;
-          best_tabu_i = i;
-          best_tabu_j = j;
-        }
-      }
-
-      // Switch back
-      temp = solution[i];
-      solution[i] = solution[j];
-      solution[j] = temp;
-    }
-  }
-
-  if (best_i == -1)
-  {
-    temp = solution[best_tabu_i];
-    solution[best_tabu_i] = solution[best_tabu_j];
-    solution[best_tabu_j] = temp;
-  } else {
-    temp = solution[best_i];
-    solution[best_i] = solution[best_j];
-    solution[best_j] = temp;
-  }
-
-  return solution;
+  std::vector<int> solution = solve();
+  print_solution(solution);
 }

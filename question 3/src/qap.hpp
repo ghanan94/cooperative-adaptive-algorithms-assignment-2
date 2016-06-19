@@ -4,7 +4,7 @@
 #define __QAP_HPP__
 
 #define NUM_OBJECTS 20
-#define TABU_TENURE 3
+#define TABU_TENURE 5
 #define SEARCH_END_COUNT 100
 
 #include <string>
@@ -19,7 +19,7 @@ public:
   ~QAP();
   void print_flow_table();
   void print_distance_table();
-  std::vector<int> solve();
+  void find_solution();
 
 private:
   Table flow_table;
@@ -33,7 +33,7 @@ private:
   bool tabu_check(int, int);
   void tabu_reset();
   void print_solution(std::vector<int>&);
-  std::vector<int> find_best_move(std::vector<int>);
+  std::vector<int> solve();
 };
 
 #endif // __QAP_HPP__
