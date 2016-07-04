@@ -1,18 +1,27 @@
 #include "qap.hpp"
 #include <fstream> // std::ifstream, std::getline
 #include <sstream> // std::stringstream
-#include <climits>
+#include <climits> // INT_MAX
 
+/*
+ * Constructor
+ */
 QAP::QAP(std::string flow_table_file_path, std::string distance_table_file_path)
 {
   parse_flow_distance_table_file(flow_table, flow_table_file_path);
   parse_flow_distance_table_file(distance_table, distance_table_file_path);
 }
 
+/*
+ * Destructor
+ */
 QAP::~QAP()
 {
 }
 
+/*
+ * Parse the flow or distance table data given the file name.
+ */
 void QAP::parse_flow_distance_table_file(Table& table, std::string file_name)
 {
   std::ifstream file;
@@ -52,6 +61,9 @@ void QAP::parse_flow_distance_table_file(Table& table, std::string file_name)
   }
 }
 
+/*
+ * Print given table.
+ */
 void QAP::print_table(Table& table)
 {
   for (int i = 0; i < table.size(); ++i)
@@ -65,18 +77,30 @@ void QAP::print_table(Table& table)
   }
 }
 
+/*
+ * Print the flow table.
+ */
 void QAP::print_flow_table()
 {
   printf("\nFlow Table:\n");
   print_table(flow_table);
 }
 
+/*
+ * Reset the distance table.
+ */
 void QAP::print_distance_table()
 {
   printf("\nDistance Table:\n");
   print_table(distance_table);
 }
 
+/*
+ * Given n objects, and the flows f(i,j) between objcet i and j and given n
+ * sites with distance d(r, s) between the sites r and s, the total cost is
+ * Σ(r = 1 to n)[Σ(s = 1 to n)[f(p(r), p(s)) * d(r, s)]], where p(r) is the
+ * objcet at site r.
+ */
 int QAP::evaluate_cost(std::vector<int> &assignment)
 {
   int cost = 0;
@@ -90,6 +114,14 @@ int QAP::evaluate_cost(std::vector<int> &assignment)
   return cost;
 }
 
+/*
+ * Solve the QAP given the flow and distance tables using TABU search.
+ * If a non-tabu move is available, do the best non-tabu move.
+ * If no non-tabu move is avalable, do the best tabu move.
+ * On each move, add the move to the tabu table.
+ * Keep trying to find moves until no better move has been found for
+ * SEARCH_END_COUNT iterations.
+ */
 std::vector<int> QAP::solve()
 {
   // Below is just a random initial solution that will be improved on
@@ -151,6 +183,7 @@ std::vector<int> QAP::solve()
 
     if (best_i == -1)
     {
+      // No non-tabu moves available
       temp = intermediate_solution[best_tabu_i];
       intermediate_solution[best_tabu_i] = intermediate_solution[best_tabu_j];
       intermediate_solution[best_tabu_j] = temp;
@@ -159,6 +192,7 @@ std::vector<int> QAP::solve()
       tabu_add(best_tabu_i, best_tabu_j);
     } else
     {
+      // Do a non-tabu move
       temp = intermediate_solution[best_i];
       intermediate_solution[best_i] = intermediate_solution[best_j];
       intermediate_solution[best_j] = temp;
@@ -180,6 +214,9 @@ std::vector<int> QAP::solve()
   return solution;
 }
 
+/*
+ * Add a move to the tabu table
+ */
 void QAP::tabu_add(int i, int j)
 {
   if (i == j)
@@ -210,6 +247,9 @@ void QAP::tabu_add(int i, int j)
   }*/
 }
 
+/*
+ * Reset the tabu table
+ */
 void QAP::tabu_reset()
 {
   tabu_table.clear();
@@ -227,6 +267,10 @@ void QAP::tabu_reset()
   }
 }
 
+/*
+ * Check if a move is tabu.
+ * Returns true if it is tabu; false otherwise.
+ */
 bool QAP::tabu_check(int i, int j)
 {
   if (i == j)
@@ -242,6 +286,9 @@ bool QAP::tabu_check(int i, int j)
   }
 }
 
+/*
+ * Print a given solution.
+ */
 void QAP::print_solution(std::vector<int>& solution)
 {
   printf("\nSolution:\n");
@@ -253,6 +300,9 @@ void QAP::print_solution(std::vector<int>& solution)
   printf("Cost: %d\n", evaluate_cost(solution));
 }
 
+/*
+ * Find the solution and print it.
+ */
 void QAP::find_solution()
 {
   std::vector<int> solution = solve();
