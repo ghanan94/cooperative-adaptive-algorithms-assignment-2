@@ -33,4 +33,5 @@ private:
 
   void parse_problem_file(const std::string);
   double distance_between_nodes(Node*, Node*);
+  double cost_function(std::vector<Node*>&);
 };

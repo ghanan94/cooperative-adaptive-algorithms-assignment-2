@@ -130,6 +130,18 @@ double CVRP::distance_between_nodes(Node* from_node, Node* to_node)
   return sqrt(pow(to_node->get_x() - from_node->get_x(), 2.0) + pow(to_node->get_y() - from_node->get_y(), 2.0));
 }
 
+double CVRP::cost_function(std::vector<Node*>& solution)
+{
+  double cost = 0;
+
+  for (int i = 1; i < solution.size(); ++i)
+  {
+    cost += distance_between_nodes(solution[i - 1], solution[i]);
+  }
+
+  return cost;
+}
+
 /**********************************CVRP::Node**********************************/
 CVRP::Node::Node(const int id, const int x, const int y, const int service_time):
 id(id),
