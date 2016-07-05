@@ -33,8 +33,6 @@ void CVRP::parse_problem_file(const std::string file_name)
       std::stringstream linestream(line);
       std::getline(linestream, data, ':');
 
-      printf("Data: %s\n", data.c_str());
-
       if (data.find("CAPACITY") != std::string::npos)
       {
         std::getline(linestream, data, ':');
@@ -72,6 +70,34 @@ void CVRP::parse_problem_file(const std::string file_name)
           Node* node = new Node(id, x, y, 0);
           nodes.push_back(node);
         }
+      } else if (data.find("DEMAND_SECTION") != std::string::npos)
+      {
+        int i = dimension;
+
+        while (i-- != 0)
+        {
+          int id;
+          int service_time;
+
+          std::getline(problem_file, line);
+          std::stringstream node_coord_section_linestream(line);
+
+          // Node info is formatted as follows: "<id> <service_time>"
+          // ***There is no space before <id> unlike NODE_COORD_SECTION
+          std::getline(node_coord_section_linestream, data, ' ');
+          id = std::stoi(data);
+
+          std::getline(node_coord_section_linestream, data, ' ');
+          service_time = std::stoi(data);
+
+          nodes[id - 1]->set_service_time(service_time);
+
+          // Check if depot
+          if (service_time == 0)
+          {
+            depot = nodes[id - 1];
+          }
+        }
       }
     }
 
@@ -79,6 +105,21 @@ void CVRP::parse_problem_file(const std::string file_name)
   } else
   {
     printf("File error\n");
+  }
+}
+
+void CVRP::print_nodes()
+{
+  for (int i = 0; i < nodes.size(); i++)
+  {
+    printf("id: %-2d x: %-2d y: %-2d s: %-2d", nodes[i]->get_id(), nodes[i]->get_x(), nodes[i]->get_y(), nodes[i]->get_service_time());
+
+    if (nodes[i] == depot)
+    {
+      printf(" [DEPOT]");
+    }
+
+    printf("\n");
   }
 }
 
@@ -108,4 +149,9 @@ const int CVRP::Node::get_y()
 const int CVRP::Node::get_service_time()
 {
   return service_time;
+}
+
+void CVRP::Node::set_service_time(const int service_time)
+{
+  this->service_time = service_time;
 }

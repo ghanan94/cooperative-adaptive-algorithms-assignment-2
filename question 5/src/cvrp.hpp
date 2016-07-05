@@ -6,7 +6,8 @@ class CVRP
 public:
   CVRP(const std::string);
   ~CVRP();
-
+  void print_nodes();
+  
 private:
   class Node
   {
@@ -14,7 +15,7 @@ private:
     const int id;
     const int x;
     const int y;
-    const int service_time;
+    int service_time;
 
   public:
     Node(const int, const int, const int, const int);
@@ -23,6 +24,8 @@ private:
     const int get_x();
     const int get_y();
     const int get_service_time();
+
+    void set_service_time(const int);
   };
 
   Node* depot;
