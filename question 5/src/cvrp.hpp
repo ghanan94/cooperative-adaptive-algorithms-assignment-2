@@ -27,4 +27,6 @@ private:
 
   Node* depot;
   std::vector<Node*> nodes;
+
+  void parse_problem_file(const std::string);
 };
