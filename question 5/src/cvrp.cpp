@@ -5,6 +5,8 @@
 
 CVRP::CVRP(const std::string file_name)
 {
+  capacity = 0;
+  dimension = 0;
   parse_problem_file(file_name);
 }
 
@@ -26,9 +28,6 @@ void CVRP::parse_problem_file(const std::string file_name)
 
   if (problem_file.is_open())
   {
-    int capacity = 0;
-    int dimension = 0;
-
     while (std::getline(problem_file, line))
     {
       std::stringstream linestream(line);
@@ -111,7 +110,7 @@ void CVRP::parse_problem_file(const std::string file_name)
 
 void CVRP::print_nodes()
 {
-  for (int i = 0; i < nodes.size(); i++)
+  for (int i = 0; i < dimension; i++)
   {
     printf("id: %-2d x: %-2d y: %-2d s: %-2d", nodes[i]->get_id(), nodes[i]->get_x(), nodes[i]->get_y(), nodes[i]->get_service_time());
 
@@ -127,7 +126,7 @@ void CVRP::print_nodes()
 double CVRP::distance_between_nodes(Node* from_node, Node* to_node)
 {
   // Calculate euclidean distance
-  return sqrt(pow(to_node->get_x() - from_node->get_x(), 2.0) + pow(to_node->get_y() - from_node->get_y(), 2.0));
+  return sqrt(pow((int)(to_node->get_x() - from_node->get_x()), 2.0) + pow((int)(to_node->get_y() - from_node->get_y()), 2.0));
 }
 
 double CVRP::cost_function(std::vector<Node*>& solution)
@@ -142,34 +141,86 @@ double CVRP::cost_function(std::vector<Node*>& solution)
   return cost;
 }
 
+/*
+ * Solution is represented as [d, R1, d, R2, ..., d, Rn]
+ * d = depot id number, R1 is list of nodes in a route
+ */
+void CVRP::solve()
+{
+  std::vector<Node*> solution;
+
+  // Solution must start with depot
+  solution.push_back(depot);
+
+  for(int i = 1; i < dimension; ++i)
+  {
+    // Let initial solution be just 1 route.
+    if (nodes[i] != depot)
+    {
+      solution.push_back(nodes[i]);
+    }
+  }
+
+  // Solution must start with depot
+  solution.push_back(depot);
+
+  print_solution(solution);
+}
+
+void CVRP::print_solution(std::vector<Node*>& solution)
+{
+  int route_num = 0;
+
+  printf("\nSolution:  ");
+
+  for (int i = 0; i < solution.size() - 1; ++i)
+  {
+    if (solution[i] == depot)
+    {
+      // Overwrite last 2 letters in console with spaces
+      printf("\b\b  \n");
+
+      printf("Route %2d: ", route_num++);
+    } else
+    {
+      printf("[%d]->", solution[i]->get_id());
+    }
+  }
+
+  // Overwrite last 2 letters in console with spaces
+  printf("\b\b  \n");
+
+  printf("Total cost: %f\n", cost_function(solution));
+}
+
 /**********************************CVRP::Node**********************************/
-CVRP::Node::Node(const int id, const int x, const int y, const int service_time):
+CVRP::Node::Node(const unsigned int id, const unsigned int x, const unsigned int y, const unsigned int service_time):
 id(id),
 x(x),
 y(y),
 service_time(service_time) {}
 
-const int CVRP::Node::get_id()
+const unsigned int CVRP::Node::get_id()
 {
   return id;
 }
 
-const int CVRP::Node::get_x()
+const unsigned int CVRP::Node::get_x()
 {
   return x;
 }
 
-const int CVRP::Node::get_y()
+const unsigned int CVRP::Node::get_y()
 {
   return y;
 }
 
-const int CVRP::Node::get_service_time()
+const unsigned int CVRP::Node::get_service_time()
 {
   return service_time;
 }
 
-void CVRP::Node::set_service_time(const int service_time)
+void CVRP::Node::set_service_time(const unsigned int service_time)
 {
   this->service_time = service_time;
 }
