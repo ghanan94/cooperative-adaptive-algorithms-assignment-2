@@ -1,6 +1,7 @@
 #include "cvrp.hpp"
 #include <fstream> // std::ifstream, std::getline
 #include <sstream> // std::stringstream
+#include <cmath>
 
 CVRP::CVRP(const std::string file_name)
 {
@@ -123,6 +124,11 @@ void CVRP::print_nodes()
   }
 }
 
+double CVRP::distance_between_nodes(Node* from_node, Node* to_node)
+{
+  // Calculate euclidean distance
+  return sqrt(pow(to_node->get_x() - from_node->get_x(), 2.0) + pow(to_node->get_y() - from_node->get_y(), 2.0));
+}
 
 /**********************************CVRP::Node**********************************/
 CVRP::Node::Node(const int id, const int x, const int y, const int service_time):

@@ -7,7 +7,7 @@ public:
   CVRP(const std::string);
   ~CVRP();
   void print_nodes();
-  
+
 private:
   class Node
   {
@@ -32,4 +32,5 @@ private:
   std::vector<Node*> nodes;
 
   void parse_problem_file(const std::string);
+  double distance_between_nodes(Node*, Node*);
 };
