@@ -3,12 +3,6 @@
 
 class CVRP
 {
-public:
-  CVRP(const std::string);
-  ~CVRP();
-  void print_nodes();
-  void solve();
-
 private:
   class Node
   {
@@ -29,7 +23,7 @@ private:
     void set_service_time(const unsigned int);
   };
 
-  unsigned int capacity;
+  unsigned int max_capacity;
   unsigned int dimension;
   Node* depot;
   std::vector<Node*> nodes;
@@ -38,4 +32,11 @@ private:
   double distance_between_nodes(Node*, Node*);
   double cost_function(std::vector<Node*>&);
   void print_solution(std::vector<Node*>&);
+
+public:
+  CVRP(const std::string);
+  ~CVRP();
+  void print_nodes();
+  void solve(const double, const double, const double, const unsigned int);
+  void initial_solution(std::vector<Node*>&, std::vector<unsigned int>&);
 };

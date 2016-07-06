@@ -5,7 +5,7 @@
 
 CVRP::CVRP(const std::string file_name)
 {
-  capacity = 0;
+  max_capacity = 0;
   dimension = 0;
   parse_problem_file(file_name);
 }
@@ -36,7 +36,7 @@ void CVRP::parse_problem_file(const std::string file_name)
       if (data.find("CAPACITY") != std::string::npos)
       {
         std::getline(linestream, data, ':');
-        capacity = std::stoi(data);
+        max_capacity = std::stoi(data);
       } else if (data.find("DIMENSION") != std::string::npos)
       {
         std::getline(linestream, data, ':');
@@ -145,24 +145,30 @@ double CVRP::cost_function(std::vector<Node*>& solution)
  * Solution is represented as [d, R1, d, R2, ..., d, Rn]
  * d = depot id number, R1 is list of nodes in a route
  */
-void CVRP::solve()
+void CVRP::solve(const double intial_temperature, const double final_temperature, const double alpha, const unsigned int iterations_per_temperature)
 {
+  double temperature = intial_temperature;
   std::vector<Node*> solution;
+  std::vector<Node*> temp_solution;
+  std::vector<unsigned int> capacity;
+  double solution_cost;
+  double temp_solution_cost;
 
-  // Solution must start with depot
-  solution.push_back(depot);
+  initial_solution(solution, capacity);
 
-  for(int i = 1; i < dimension; ++i)
+  solution_cost = cost_function(solution);
+  temp_solution = solution;
+  temp_solution_cost = solution_cost;
+
+  while (temperature > final_temperature)
   {
-    // Let initial solution be just 1 route.
-    if (nodes[i] != depot)
+    for (int i = 0; i < iterations_per_temperature; ++i)
     {
-      solution.push_back(nodes[i]);
+      // TODO
     }
-  }
 
-  // Solution must start with depot
-  solution.push_back(depot);
+    temperature *= alpha;
+  }
 
   print_solution(solution);
 }
@@ -191,6 +197,50 @@ void CVRP::print_solution(std::vector<Node*>& solution)
   printf("\b\b  \n");
 
   printf("Total cost: %f\n", cost_function(solution));
+}
+
+/*
+ * Initial solution generated deterministically using a greedy algorithm
+ * based on a first-fit approach. Look at each customer, and assign the first
+ * customer in the list to a new route as long as its capcity doesnt violate
+ * max_capacity and sets its status to visited. The algorithm then proceeds to
+ * the next customer in the list. If it encounters a customer demand that violates
+ * the max_capacity, the customer is skipped and the following customer in the
+ * list is processed. If the route capacity is exceeded, then a new route is
+ * allocated and the algorithm repeats until all customers have been assigned
+ * to routes.
+ */
+void CVRP::initial_solution(std::vector<Node*>& solution, std::vector<unsigned int>& capacity)
+{
+  std::vector<bool> visited(dimension, false);
+  int counter = 1;
+  int route = 0;
+
+  while (counter <dimension) {
+    // Allocate a new route
+    capacity.push_back(0);
+    solution.push_back(depot);
+
+    for (int j = 0; j < dimension; j++)
+    {
+      // If node is not visited, not depot, doesn't violate current route's
+      // max_capcity, then add to route
+      if (nodes[j] != depot && !visited[j])
+      {
+        if (capacity[route] + nodes[j]->get_service_time() < max_capacity)
+        {
+          solution.push_back(nodes[j]);
+          visited[j] = true;
+          capacity[route] += nodes[j]->get_service_time();
+          ++counter;
+        }
+      }
+    }
+
+    ++route;
+  }
+
+  solution.push_back(depot);
 }
 
 /**********************************CVRP::Node**********************************/

@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
   CVRP cvrp("A-VRP/A-n32-k5.vrp");
   cvrp.print_nodes();
-  cvrp.solve();
+  cvrp.solve(1000, 1, 0.85, 100);
 
   return 0;
 }
