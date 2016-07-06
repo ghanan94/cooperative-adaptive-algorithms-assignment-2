@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[])
 {
-  QAP qap("flow_distance_tables/Flow.csv", "flow_distance_tables//Distance.csv");
+  QAP qap("flow_distance_tables/Flow.csv", "flow_distance_tables/Distance.csv");
   qap.print_flow_table();
   qap.print_distance_table();
   qap.find_solution();
