@@ -147,27 +147,57 @@ double CVRP::cost_function(std::vector<Node*>& solution)
  */
 void CVRP::solve(const double intial_temperature, const double final_temperature, const double alpha, const unsigned int iterations_per_temperature)
 {
-  double temperature = intial_temperature;
+  double current_temperature = intial_temperature;
+  std::vector<Node*> best_solution;
   std::vector<Node*> solution;
-  std::vector<Node*> temp_solution;
   std::vector<unsigned int> capacity;
+  double best_solution_cost;
   double solution_cost;
-  double temp_solution_cost;
 
   initial_solution(solution, capacity);
 
   solution_cost = cost_function(solution);
-  temp_solution = solution;
-  temp_solution_cost = solution_cost;
+  best_solution = solution;
+  best_solution_cost = solution_cost;
 
-  while (temperature > final_temperature)
+  while (current_temperature > final_temperature)
   {
     for (int i = 0; i < iterations_per_temperature; ++i)
     {
-      // TODO
+      std::vector<Node*> temp_solution = neighbour(solution);
+      double temp_solution_cost = cost_function(temp_solution);
+      double delta_cost = temp_solution_cost - solution_cost;
+
+      if (delta_cost < 0)
+      {
+        // Solution improves on current solution so accept it
+        solution = temp_solution;
+        solution_cost = temp_solution_cost;
+
+        if (solution_cost < best_solution_cost)
+        {
+          // Current solution is better than current best solution so
+          // update current best solution
+          best_solution = solution;
+          best_solution_cost = solution_cost;
+        }
+      } else
+      {
+        // Solution gets worse so randomly determine if the new solution
+        // should be accepted as per acceptance probability
+        // exp(-1 * delta_cost / current_temperature)
+        double random_number = ((double)rand()) / RAND_MAX;
+        double acceptance_probability = exp(-1 * delta_cost / current_temperature);
+
+        if (random_number < acceptance_probability)
+        {
+          solution = temp_solution;
+          solution_cost = temp_solution_cost;
+        }
+      }
     }
 
-    temperature *= alpha;
+    current_temperature *= alpha;
   }
 
   print_solution(solution);
@@ -243,6 +273,11 @@ void CVRP::initial_solution(std::vector<Node*>& solution, std::vector<unsigned i
   solution.push_back(depot);
 }
 
+std::vector<CVRP::Node*> CVRP::neighbour(std::vector<Node*> solution)
+{
+  // TODO
+  return solution;
+}
 /**********************************CVRP::Node**********************************/
 CVRP::Node::Node(const unsigned int id, const unsigned int x, const unsigned int y, const unsigned int service_time):
 id(id),

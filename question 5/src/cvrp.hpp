@@ -32,6 +32,7 @@ private:
   double distance_between_nodes(Node*, Node*);
   double cost_function(std::vector<Node*>&);
   void print_solution(std::vector<Node*>&);
+  std::vector<Node*> neighbour(std::vector<Node*>);
 
 public:
   CVRP(const std::string);
