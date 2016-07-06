@@ -19,10 +19,14 @@ DFS: Same as BFS except, instead of added the newly retrieved nodes to the end
 of the queue, they are added to the front of the queue.
 
 A*: Same as BFS except, at the beginning of each iteration of the loop, the
-'to-be-visited' queue is sorted to order the queue by the cost to each of the
-nodes to be visited. The node at the front of the queue will be the node with
+'to-be-visited' queue is sorted to order the queue by the estimated cost to
+the goal node. The node at the front of the queue will be the node with
 the lowest cost so far in the queue, and the node at the end of the queue will
-be the node with the highest cost so far in the queue.
+be the node with the highest cost so far in the queue. The estimated cost to the
+goal node (heuristic function) is the manchester distance between the node and
+the goal node.
+
+
 
 2)
 Look at 3
