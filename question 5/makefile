@@ -22,4 +22,4 @@ cvrp: $(GENERATE_OBJECTS)
 
 clean:
 	-rm -f $(OBJECT_DIR)/*.o
-	-rm -f qap
+	-rm -f cvrp
