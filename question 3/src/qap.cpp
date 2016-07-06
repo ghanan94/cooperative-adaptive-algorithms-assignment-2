@@ -124,8 +124,26 @@ int QAP::evaluate_cost(std::vector<int> &assignment)
  */
 std::vector<int> QAP::solve()
 {
+  std::srand(time(NULL));
+
   // Below is just a random initial solution that will be improved on
-  std::vector<int> solution = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+  std::vector<int> solution;
+
+  // Generate a random initial solution
+  while (solution.size() != NUM_OBJECTS)
+  {
+    int val = ((int)rand()) % NUM_OBJECTS;
+
+    if (std::find(solution.begin(), solution.end(), val) == solution.end())
+    {
+      // Value is not already in solution
+      solution.push_back(val);
+    }
+  }
+
+  printf("Initial solution:\n");
+  print_solution(solution);
+
   std::vector<int> intermediate_solution = solution;
   int solution_cost = evaluate_cost(solution);
   int intermediate_solution_cost = solution_cost;
