@@ -465,7 +465,7 @@ void Board::do_best_move()
         {
           Board* new_board = travel(*(*board)[x][y], available_directions[i]);
 
-          int new_board_min_score = new_board->min_max_possible_score(current_player, true, MIN_MAX_TREE_DEPTH);
+          int new_board_min_score = new_board->min_max_possible_score(current_player, true, MIN_MAX_TREE_DEPTH, best_score);
 
           if (best_score < new_board_min_score) {
             best_score = new_board_min_score;
@@ -494,7 +494,7 @@ void Board::do_best_move()
   }
 }
 
-int Board::min_max_possible_score(Square::Player for_player, bool calculate_min, unsigned int depth)
+int Board::min_max_possible_score(Square::Player for_player, bool calculate_min, unsigned int depth, int alpha_beta)
 {
   if (depth == 0)
   {
@@ -514,7 +514,7 @@ int Board::min_max_possible_score(Square::Player for_player, bool calculate_min,
         for (int i = 0; i < available_directions.size(); ++i)
         {
           Board* new_board = travel(*(*board)[x][y], available_directions[i]);
-          int new_board_score = new_board->min_max_possible_score(for_player, !calculate_min, depth - 1);
+          int new_board_score = new_board->min_max_possible_score(for_player, !calculate_min, depth - 1, current_score);
 
           delete new_board;
 
@@ -526,6 +526,25 @@ int Board::min_max_possible_score(Square::Player for_player, bool calculate_min,
             current_score = new_board_score;
           }
         }
+      }
+
+      // Alpha beta pruning
+      if (calculate_min && current_score <= alpha_beta)
+      {
+        // If we are calculating min, then parent is calculating max.
+        // If parent score is greater than current score, then we dont need
+        // to keep going because this score won't even be used anyways because
+        // any future resulting calculation will only result in a current_score
+        // value is that equal to the current_score or less.
+        return current_score;
+      } else if (!calculate_min && current_score >= alpha_beta)
+      {
+        // If we are calculating max, then parent is calculating min.
+        // If parent score is less than current score, then we don't need to
+        // keep going because this score won't even be used anyways because
+        // any future resulting calculation will only result in a current_score
+        // value that is equal to the current_score or greater.
+        return current_score;
       }
     }
   }
