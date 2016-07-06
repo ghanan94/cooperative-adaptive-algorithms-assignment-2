@@ -129,27 +129,32 @@ double CVRP::distance_between_nodes(Node* from_node, Node* to_node)
   return sqrt(pow((int)(to_node->get_x() - from_node->get_x()), 2.0) + pow((int)(to_node->get_y() - from_node->get_y()), 2.0));
 }
 
-double CVRP::cost_function(std::vector<Node*>& solution)
+double CVRP::cost_function(std::vector<std::vector<Node*>>& solution)
 {
   double cost = 0;
 
-  for (int i = 1; i < solution.size(); ++i)
+  for (int i = 0; i < solution.size(); ++i)
   {
-    cost += distance_between_nodes(solution[i - 1], solution[i]);
+    for(int j = 1; j < solution[i].size(); ++j)
+    {
+      cost += distance_between_nodes(solution[i][j - 1], solution[i][j]);
+    }
   }
 
   return cost;
 }
 
 /*
- * Solution is represented as [d, R1, d, R2, ..., d, Rn]
- * d = depot id number, R1 is list of nodes in a route
+ * Solution is represented as [R1, R2, ..., Rn]
+ * Where Rn is a vector of route path and Rn starts and ends with depot
  */
 void CVRP::solve(const double intial_temperature, const double final_temperature, const double alpha, const unsigned int iterations_per_temperature)
 {
+  srand(time(NULL));
+
   double current_temperature = intial_temperature;
-  std::vector<Node*> best_solution;
-  std::vector<Node*> solution;
+  std::vector<std::vector<Node*>> best_solution;
+  std::vector<std::vector<Node*>> solution;
   std::vector<unsigned int> capacity;
   double best_solution_cost;
   double solution_cost;
@@ -164,7 +169,7 @@ void CVRP::solve(const double intial_temperature, const double final_temperature
   {
     for (int i = 0; i < iterations_per_temperature; ++i)
     {
-      std::vector<Node*> temp_solution = neighbour(solution);
+      std::vector<std::vector<Node*>> temp_solution = neighbour(solution);
       double temp_solution_cost = cost_function(temp_solution);
       double delta_cost = temp_solution_cost - solution_cost;
 
@@ -203,28 +208,24 @@ void CVRP::solve(const double intial_temperature, const double final_temperature
   print_solution(solution);
 }
 
-void CVRP::print_solution(std::vector<Node*>& solution)
+void CVRP::print_solution(std::vector<std::vector<Node*>>& solution)
 {
-  int route_num = 0;
+  printf("\nSolution:\n");
 
-  printf("\nSolution:  ");
-
-  for (int i = 0; i < solution.size() - 1; ++i)
+  for (int i = 0; i < solution.size(); ++i)
   {
-    if (solution[i] == depot)
-    {
-      // Overwrite last 2 letters in console with spaces
-      printf("\b\b  \n");
+    printf("Route %2d: ", i);
+    unsigned int cap = 0;
 
-      printf("Route %2d: ", route_num++);
-    } else
+    for (int j = 1; j < solution[i].size() - 1; ++j)
     {
-      printf("[%d]->", solution[i]->get_id());
+      printf("[%d]->", solution[i][j]->get_id());
+
+      cap += solution[i][j]->get_service_time();
     }
-  }
 
-  // Overwrite last 2 letters in console with spaces
-  printf("\b\b  \n");
+    printf("\b\b ~~~~Capacity: %d\n", cap);
+  }
 
   printf("Total cost: %f\n", cost_function(solution));
 }
@@ -240,16 +241,18 @@ void CVRP::print_solution(std::vector<Node*>& solution)
  * allocated and the algorithm repeats until all customers have been assigned
  * to routes.
  */
-void CVRP::initial_solution(std::vector<Node*>& solution, std::vector<unsigned int>& capacity)
+void CVRP::initial_solution(std::vector<std::vector<Node*>>& solution, std::vector<unsigned int>& capacity)
 {
   std::vector<bool> visited(dimension, false);
   int counter = 1;
   int route = 0;
 
-  while (counter <dimension) {
+  while (counter < dimension) {
     // Allocate a new route
     capacity.push_back(0);
-    solution.push_back(depot);
+    std::vector<Node*> new_route;
+
+    new_route.push_back(depot);
 
     for (int j = 0; j < dimension; j++)
     {
@@ -259,7 +262,7 @@ void CVRP::initial_solution(std::vector<Node*>& solution, std::vector<unsigned i
       {
         if (capacity[route] + nodes[j]->get_service_time() < max_capacity)
         {
-          solution.push_back(nodes[j]);
+          new_route.push_back(nodes[j]);
           visited[j] = true;
           capacity[route] += nodes[j]->get_service_time();
           ++counter;
@@ -267,15 +270,65 @@ void CVRP::initial_solution(std::vector<Node*>& solution, std::vector<unsigned i
       }
     }
 
+    new_route.push_back(depot);
+    solution.push_back(new_route);
     ++route;
   }
-
-  solution.push_back(depot);
 }
 
-std::vector<CVRP::Node*> CVRP::neighbour(std::vector<Node*> solution)
+std::vector<std::vector<CVRP::Node*>> CVRP::neighbour(std::vector<std::vector<Node*>> solution)
 {
-  // TODO
+  unsigned int route_a;
+  unsigned int route_b;
+  unsigned int route_a_idx;
+  unsigned int route_b_idx;
+  bool loop = true;
+
+  while (loop) {
+    loop = false;
+
+    // Chose a random route
+    route_a = ((unsigned int)rand()) % solution.size();
+
+    // Chose a random non-depot customer in route_a
+    do {
+      route_a_idx = ((unsigned int)rand()) % solution[route_a].size();
+    } while (depot == solution[route_a][route_a_idx]);
+
+    // Chose another random route cannot be same as before
+    do {
+      route_b = ((unsigned int)rand()) % solution.size();
+    } while (route_a == route_b);
+
+    // Chose a random non-depot customer in route_b
+    do {
+      route_b_idx = ((unsigned int)rand()) % solution[route_b].size();
+    } while (depot == solution[route_b][route_b_idx]);
+
+    Node* tmp = solution[route_a][route_a_idx];
+    solution[route_a][route_a_idx] = solution[route_b][route_b_idx];
+    solution[route_b][route_b_idx] = tmp;
+
+    unsigned int cap;
+
+    for (int i = 0; i < solution.size(); ++i)
+    {
+      cap = 0;
+
+      for (int j = 1; j < solution[i].size() - 1; ++j)
+      {
+        cap += solution[i][j]->get_service_time();
+      }
+
+      if (cap >= max_capacity)
+      {
+        // a route violates max_capacity
+        loop = true;
+        break;
+      }
+    }
+  }
+
   return solution;
 }
 /**********************************CVRP::Node**********************************/

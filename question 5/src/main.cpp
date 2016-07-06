@@ -5,8 +5,13 @@
 
 int main(int argc, char *argv[])
 {
-  CVRP cvrp("A-VRP/A-n32-k5.vrp");
-  cvrp.print_nodes();
+  if (argc < 2)
+  {
+    printf("USAGE:\n\t%s <path to vrp file>\n", argv[0]);
+    return 0;
+  }
+
+  CVRP cvrp(argv[1]);
   cvrp.solve(1000, 1, 0.85, 100);
 
   return 0;

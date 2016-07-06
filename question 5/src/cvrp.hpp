@@ -30,14 +30,14 @@ private:
 
   void parse_problem_file(const std::string);
   double distance_between_nodes(Node*, Node*);
-  double cost_function(std::vector<Node*>&);
-  void print_solution(std::vector<Node*>&);
-  std::vector<Node*> neighbour(std::vector<Node*>);
+  double cost_function(std::vector<std::vector<Node*>>&);
+  void print_solution(std::vector<std::vector<Node*>>&);
+  void initial_solution(std::vector<std::vector<Node*>>&, std::vector<unsigned int>&);
+  std::vector<std::vector<Node*>> neighbour(std::vector<std::vector<Node*>>);
 
 public:
   CVRP(const std::string);
   ~CVRP();
   void print_nodes();
   void solve(const double, const double, const double, const unsigned int);
-  void initial_solution(std::vector<Node*>&, std::vector<unsigned int>&);
 };
