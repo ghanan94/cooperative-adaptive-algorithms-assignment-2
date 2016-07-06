@@ -135,10 +135,14 @@ double CVRP::cost_function(std::vector<std::vector<Node*>>& solution)
 
   for (int i = 0; i < solution.size(); ++i)
   {
+    cost += distance_between_nodes(depot, solution[i][0]);
+
     for(int j = 1; j < solution[i].size(); ++j)
     {
       cost += distance_between_nodes(solution[i][j - 1], solution[i][j]);
     }
+
+    cost += distance_between_nodes(solution[i][solution[i].size() - 1], depot);
   }
 
   return cost;
@@ -146,7 +150,8 @@ double CVRP::cost_function(std::vector<std::vector<Node*>>& solution)
 
 /*
  * Solution is represented as [R1, R2, ..., Rn]
- * Where Rn is a vector of route path and Rn starts and ends with depot
+ * Where Rn is a vector of route path. it is implied  Rn starts and ends
+ * with the depot
  */
 void CVRP::solve(const double intial_temperature, const double final_temperature, const double alpha, const unsigned int iterations_per_temperature)
 {
@@ -217,7 +222,7 @@ void CVRP::print_solution(std::vector<std::vector<Node*>>& solution)
     printf("Route %2d: ", i);
     unsigned int cap = 0;
 
-    for (int j = 1; j < solution[i].size() - 1; ++j)
+    for (int j = 0; j < solution[i].size(); ++j)
     {
       printf("[%d]->", solution[i][j]->get_id());
 
@@ -252,8 +257,6 @@ void CVRP::initial_solution(std::vector<std::vector<Node*>>& solution, std::vect
     capacity.push_back(0);
     std::vector<Node*> new_route;
 
-    new_route.push_back(depot);
-
     for (int j = 0; j < dimension; j++)
     {
       // If node is not visited, not depot, doesn't violate current route's
@@ -270,7 +273,6 @@ void CVRP::initial_solution(std::vector<std::vector<Node*>>& solution, std::vect
       }
     }
 
-    new_route.push_back(depot);
     solution.push_back(new_route);
     ++route;
   }
@@ -291,9 +293,7 @@ std::vector<std::vector<CVRP::Node*>> CVRP::neighbour(std::vector<std::vector<No
     route_a = ((unsigned int)rand()) % solution.size();
 
     // Chose a random non-depot customer in route_a
-    do {
-      route_a_idx = ((unsigned int)rand()) % solution[route_a].size();
-    } while (depot == solution[route_a][route_a_idx]);
+    route_a_idx = ((unsigned int)rand()) % solution[route_a].size();
 
     // Chose another random route cannot be same as before
     do {
@@ -301,9 +301,7 @@ std::vector<std::vector<CVRP::Node*>> CVRP::neighbour(std::vector<std::vector<No
     } while (route_a == route_b);
 
     // Chose a random non-depot customer in route_b
-    do {
-      route_b_idx = ((unsigned int)rand()) % solution[route_b].size();
-    } while (depot == solution[route_b][route_b_idx]);
+    route_b_idx = ((unsigned int)rand()) % solution[route_b].size();
 
     Node* tmp = solution[route_a][route_a_idx];
     solution[route_a][route_a_idx] = solution[route_b][route_b_idx];
@@ -315,7 +313,7 @@ std::vector<std::vector<CVRP::Node*>> CVRP::neighbour(std::vector<std::vector<No
     {
       cap = 0;
 
-      for (int j = 1; j < solution[i].size() - 1; ++j)
+      for (int j = 0; j < solution[i].size(); ++j)
       {
         cap += solution[i][j]->get_service_time();
       }
