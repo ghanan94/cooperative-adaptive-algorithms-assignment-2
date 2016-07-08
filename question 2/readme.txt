@@ -28,7 +28,25 @@ scores on its children if the current depth is > 0, or just return the current
 node's score. depth is used to keep track of how deep in the tree to go.
 
 3)
-// TODO: Compare evaluation functions
+Our current evaluation function determines the score by determining the
+available moves for the current user, and the available moves for the other
+user, and finds the difference (current_user_total_allowed_moves -
+other_user_total_allowed_moves = score). This evaluation funcitons works really
+well because, as the BLACK user approaches winning, their available moves
+will increase, but the other user's available moves will decrease, which will
+substantially increase the score. The highest score can only be obtained when
+the other user has no available moves, and that is when the BLACK user wins.
+
+Another evaluation function implemented, was how many moves the other user
+has available times -1. This evaluation function has the highest possible score
+of 0 (which is a win state for BLACK). This evaluation function lead to
+undesirable results as BLACK took > 30 moves to win (sometimes > 100) and
+sometimes, it seemed as though BLACK was making unintelligent moves.
+
+Another evaluation function implemented, was similar to the current implementation,
+but we only considered positions on the board with 2 or more black pieces. This
+function had reasonable results with BLACk winning within 30 and 50 moves.
+However, it still seemed as though BLACK was making unreasonable moves at times.
 
 4)
 New Game, computer is playing as BLACK
