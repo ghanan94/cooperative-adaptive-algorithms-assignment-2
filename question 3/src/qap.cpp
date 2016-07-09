@@ -141,6 +141,7 @@ std::vector<int> QAP::solve()
     }
   }
 
+  // Print the initial solution
   printf("Initial solution:\n");
   print_solution(solution);
 
@@ -233,7 +234,8 @@ std::vector<int> QAP::solve()
 }
 
 /*
- * Add a move to the tabu table
+ * Add a move to the tabu table. If TABU_DYNAMIC is set, then randomly choose
+ * a tabu tenure value from 0 to TABU_TENURE.
  */
 void QAP::tabu_add(int i, int j)
 {
@@ -242,27 +244,24 @@ void QAP::tabu_add(int i, int j)
     return;
   } else if (i > j)
   {
-    tabu_table[j][i - j - 1] = TABU_TENURE + 1;
+    if (TABU_DYNAMIC)
+    {
+      tabu_table[j][i - j - 1] = (((int)rand()) % MAX_DYNAMIC_TABU_TENURE) + 1;
+    } else
+    {
+      tabu_table[j][i - j - 1] = TABU_TENURE + 1;
+    }
   } else
   {
-    tabu_table[i][j - i - 1] = TABU_TENURE + 1;
-  }
-
-  /*printf("TABU TABLE:\n");
-  for (int a = 0; a < NUM_OBJECTS; ++a)
-  {
-    for (int b = a + 1; b < NUM_OBJECTS; ++b)
+    if (TABU_DYNAMIC)
     {
-      if (tabu_table[a][b - (a + 1)])
-      {
-        tabu_table[a][b - (a + 1)] -= 1;
-      }
-
-      printf("%d, ", tabu_table[a][b - (a + 1)]);
+      tabu_table[i][j - i - 1] = (((int)rand()) % MAX_DYNAMIC_TABU_TENURE) + 1;
+    } else
+    {
+      tabu_table[i][j - i - 1] = TABU_TENURE + 1;
     }
 
-    printf("\n");
-  }*/
+  }
 }
 
 /*

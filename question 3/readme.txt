@@ -6,10 +6,14 @@ worsened.
 When changing the tabu list size, no effect was really noticed.
 
 3)
-// TODO : change tabu list size to a dynamic one
+When changing the tabu tenure to be generated dynamically (a random value
+between 0 and a MAX_TABU_TENURE), a small improvement was observed. Before,
+an average cost of 1345 was observed, whereas after the dynamic tenure, an
+average cost of 1310 was observed.
 
 4)
-The aspiration criteria for this implementation is 'best solution so far'.
+The aspiration criteria for this implementation is 'best solution so far'. When
+this aspiration criteria was set, the solution cost decreased.
 
 5)
 When using less than the whole neighborhood to select the next solution, the
