@@ -4,14 +4,14 @@ or worsened, sometimes significantly. It can be seen that the initial solution
 generated has a significant impact on the final solution.
 
 2)
-When changing the tabu list size, the average cost of the solutions decreased
-by approximately 30.
+When increasing the tabu list size, the average cost from the final solution
+generated seemed to have decreased. When decreasing the tabu list size, the
+average cost from the final solution generated seemed to have increased.
 
 3)
-When changing the tabu tenure to be generated dynamically (a random value
-between 0 and a MAX_TABU_TENURE), a small improvement was observed. Before,
-an average cost of 1345 was observed, whereas after the dynamic tenure, an
-average cost of 1310 was observed.
+When changing the tabu list size to be dynamic, the average cost from the final
+solution seemed to not significantly change, but more better and worse seemed
+to be generated.
 
 4)
 The aspiration criteria for this implementation is 'best solution so far'. When

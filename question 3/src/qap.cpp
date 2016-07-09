@@ -245,52 +245,55 @@ void QAP::tabu_add(int i, int j)
     return;
   } else if (i > j)
   {
-    if (TABU_DYNAMIC)
-    {
-      tabu_table[j][i - j - 1] = (((int)rand()) % MAX_DYNAMIC_TABU_TENURE) + 1;
-    } else
-    {
-      tabu_table[j][i - j - 1] = TABU_TENURE + 1;
-    }
+    tabu_table[j][i - j - 1] = TABU_TENURE + 1;
   } else
   {
-    if (TABU_DYNAMIC)
-    {
-      tabu_table[i][j - i - 1] = (((int)rand()) % MAX_DYNAMIC_TABU_TENURE) + 1;
-    } else
-    {
-      tabu_table[i][j - i - 1] = TABU_TENURE + 1;
-    }
+    tabu_table[i][j - i - 1] = TABU_TENURE + 1;
   }
 
-  int min_tabu_val = INT_MAX;
-  int min_a = -1;
-  int min_b = -1;
-  int num_tabu = 0;
+  int tabu_size = MAX_TABU_SIZE;
 
-  for (int a = 0; a < tabu_table.size(); ++a)
+  if (DYNAMIC_TABU_SIZE)
   {
-    for (int b = 0; b < tabu_table[a].size(); ++b)
-    {
-      if (tabu_table[a][b] > 0)
-      {
-        ++num_tabu;
+    tabu_size = (((int)rand()) % MAX_TABU_SIZE) + 1;
+  }
 
-        if (min_tabu_val > tabu_table[a][b])
+  // Make sure size of tabu is less than or equal to tabu_size
+  while(true)
+  {
+    int min_tabu_val = INT_MAX;
+    int min_a = -1;
+    int min_b = -1;
+    int num_tabu = 0;
+
+    for (int a = 0; a < tabu_table.size(); ++a)
+    {
+      for (int b = 0; b < tabu_table[a].size(); ++b)
+      {
+        if (tabu_table[a][b] > 0)
         {
-          min_tabu_val = tabu_table[a][b];
-          min_a = a;
-          min_b = b;
+          ++num_tabu;
+
+          if (min_tabu_val > tabu_table[a][b])
+          {
+            min_tabu_val = tabu_table[a][b];
+            min_a = a;
+            min_b = b;
+          }
         }
       }
     }
-  }
 
-  if (num_tabu > MAX_TABU_SIZE)
-  {
-    // It is only possible to have a current tabu size at max 1 greater than
-    // MAX_TABU_SIZE so we only need to set the item closest to expiring to 0
-    tabu_table[min_a][min_b] = 0;
+    if (num_tabu > tabu_size)
+    {
+      // It is only possible to have a current tabu size at max 1 greater than
+      // MAX_TABU_SIZE so we only need to set the item closest to expiring to 0
+      tabu_table[min_a][min_b] = 0;
+    } else
+    {
+      // num_tabu is less than or equal to MAX_TABU_SIZE
+      break;
+    }
   }
 }
 

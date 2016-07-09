@@ -5,10 +5,9 @@
 
 #define NUM_OBJECTS 20
 #define TABU_TENURE 5
-#define MAX_DYNAMIC_TABU_TENURE 20
 #define SEARCH_END_COUNT 100
-#define TABU_DYNAMIC false
-#define MAX_TABU_SIZE 100
+#define DYNAMIC_TABU_SIZE true
+#define MAX_TABU_SIZE 1000
 
 #include <string>
 #include <vector>
