@@ -8,6 +8,7 @@
 #define MAX_DYNAMIC_TABU_TENURE 20
 #define SEARCH_END_COUNT 100
 #define TABU_DYNAMIC false
+#define MAX_TABU_SIZE 100
 
 #include <string>
 #include <vector>

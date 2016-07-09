@@ -200,9 +200,10 @@ std::vector<int> QAP::solve()
       }
     }
 
-    if (best_i == -1)
+    // If a tabu exists, but it is the global solution so far or no non-tabu
+    // exists, accept it.
+    if (best_tabu_i != -1 && (best_i == -1 || best_tabu_cost < solution_cost))
     {
-      // No non-tabu moves available
       temp = intermediate_solution[best_tabu_i];
       intermediate_solution[best_tabu_i] = intermediate_solution[best_tabu_j];
       intermediate_solution[best_tabu_j] = temp;
@@ -260,7 +261,36 @@ void QAP::tabu_add(int i, int j)
     {
       tabu_table[i][j - i - 1] = TABU_TENURE + 1;
     }
+  }
 
+  int min_tabu_val = INT_MAX;
+  int min_a = -1;
+  int min_b = -1;
+  int num_tabu = 0;
+
+  for (int a = 0; a < tabu_table.size(); ++a)
+  {
+    for (int b = 0; b < tabu_table[a].size(); ++b)
+    {
+      if (tabu_table[a][b] > 0)
+      {
+        ++num_tabu;
+
+        if (min_tabu_val > tabu_table[a][b])
+        {
+          min_tabu_val = tabu_table[a][b];
+          min_a = a;
+          min_b = b;
+        }
+      }
+    }
+  }
+
+  if (num_tabu > MAX_TABU_SIZE)
+  {
+    // It is only possible to have a current tabu size at max 1 greater than
+    // MAX_TABU_SIZE so we only need to set the item closest to expiring to 0
+    tabu_table[min_a][min_b] = 0;
   }
 }
 

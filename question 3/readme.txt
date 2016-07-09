@@ -1,9 +1,11 @@
 1)
-When changing the initial starting point, the score equally improved and
-worsened.
+When changing the initial starting point, the score either equally improved and
+or worsened, sometimes significantly. It can be seen that the initial solution
+generated has a significant impact on the final solution.
 
 2)
-When changing the tabu list size, no effect was really noticed.
+When changing the tabu list size, the average cost of the solutions decreased
+by approximately 30.
 
 3)
 When changing the tabu tenure to be generated dynamically (a random value
