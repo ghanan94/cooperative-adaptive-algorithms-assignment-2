@@ -18,8 +18,9 @@ The aspiration criteria for this implementation is 'best solution so far'. When
 this aspiration criteria was set, the solution cost decreased.
 
 5)
-When using less than the whole neighborhood to select the next solution, the
-score worsened.
+When looking at less than the whole neighborhood to select the next solution
+(only looking at 50 % of neighbors), the solutions being generated had an
+average cost that decreased by approximately 10.
 
 6)
 // TODO Add a frequency based tabu list and/or aspiration critera (designed to

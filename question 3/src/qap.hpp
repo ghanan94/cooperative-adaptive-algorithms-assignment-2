@@ -8,6 +8,7 @@
 #define SEARCH_END_COUNT 100
 #define DYNAMIC_TABU_SIZE true
 #define MAX_TABU_SIZE 1000
+#define EXCLUDE_PERCENTAGE_NEIGHBOURS 0.5 // Only look at 0.5 of the neighbours
 
 #include <string>
 #include <vector>

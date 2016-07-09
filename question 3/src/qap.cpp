@@ -167,6 +167,12 @@ std::vector<int> QAP::solve()
     {
       for (int j = i + 1; j < NUM_OBJECTS; ++j)
       {
+        if (((double)(int)rand())/RAND_MAX < EXCLUDE_PERCENTAGE_NEIGHBOURS)
+        {
+          // ignore this neighbor
+          continue;
+        }
+        
         // Do a swap
         temp = intermediate_solution[i];
         intermediate_solution[i] = intermediate_solution[j];
