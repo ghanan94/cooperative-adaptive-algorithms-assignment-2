@@ -4,7 +4,8 @@
 #define __QAP_HPP__
 
 #define NUM_OBJECTS 20
-#define TABU_TENURE 5
+#define TABU_TENURE 0
+#define TABU_TENURE_MULT 2
 #define SEARCH_END_COUNT 100
 #define DYNAMIC_TABU_SIZE true
 #define MAX_TABU_SIZE 1000

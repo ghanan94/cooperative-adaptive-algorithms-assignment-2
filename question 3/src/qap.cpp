@@ -2,6 +2,7 @@
 #include <fstream> // std::ifstream, std::getline
 #include <sstream> // std::stringstream
 #include <climits> // INT_MAX
+#include <unordered_map>
 
 /*
  * Constructor
@@ -172,7 +173,7 @@ std::vector<int> QAP::solve()
           // ignore this neighbor
           continue;
         }
-        
+
         // Do a swap
         temp = intermediate_solution[i];
         intermediate_solution[i] = intermediate_solution[j];
@@ -246,16 +247,43 @@ std::vector<int> QAP::solve()
  */
 void QAP::tabu_add(int i, int j)
 {
+  static std::unordered_map<std::string, int> tabu_freq_check;
+  std::string key;
+
+  int a;
+  int b;
+
   if (i == j)
   {
     return;
   } else if (i > j)
   {
-    tabu_table[j][i - j - 1] = TABU_TENURE + 1;
+    a = j;
+    b = i - j - 1;
   } else
   {
-    tabu_table[i][j - i - 1] = TABU_TENURE + 1;
+    a = i;
+    b = j - i - 1;
   }
+
+  char buff[6];
+  sprintf(buff, "%02d_%02d", a, b);
+  key = buff;
+
+  std::unordered_map<std::string, int>::const_iterator it = tabu_freq_check.find(key);
+  int mult = 1;
+
+  // Check if key exists in map, if it does, get frequency count and
+  // remove from table so it can be readded with new value
+  if (it != tabu_freq_check.end())
+  {
+    mult = it->second + 1;
+    tabu_freq_check.erase(key);
+  }
+
+  tabu_freq_check.insert(std::pair<std::string, int>(key, mult));
+  tabu_table[a][b] = TABU_TENURE + mult * TABU_TENURE_MULT;
+
 
   int tabu_size = MAX_TABU_SIZE;
 

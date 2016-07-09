@@ -23,5 +23,7 @@ When looking at less than the whole neighborhood to select the next solution
 average cost that decreased by approximately 10.
 
 6)
-// TODO Add a frequency based tabu list and/or aspiration critera (designed to
-encourage the search to diversify).
+After adding a frequency-based tabu-list tenure, the search seems to have both
+improved and worsened. Some solution results seem to have hit better costs, but
+other results seem to have equally worse costs. The average cost returned seems
+to have stayed constant.
